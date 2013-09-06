@@ -1,0 +1,564 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E2ABFA86-C04C-4B3F-9778-00D033B0B923}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>RTF.Client.UI</RootNamespace>
+    <AssemblyName>RTF.Client.UI.QA</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.20525.0</ExpressionBlendVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>\\ger\ec\proj\ha\computing\RTF\Client\Int\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Unc</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>true</UpdateRequired>
+    <MapFileExtensions>false</MapFileExtensions>
+    <ProductName>RTF QA</ProductName>
+    <PublisherName>SWAT Apps</PublisherName>
+    <MinimumRequiredVersion>2.1.0.0</MinimumRequiredVersion>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>setup.html</WebPage>
+    <TrustUrlParameters>true</TrustUrlParameters>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>2.1.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>true</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;_DISABLE_LOGIN_SCREEN</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>E52A31DB69C645A6E68415F44684F5CC6EEF462C</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>SwatCert.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>SwatCert.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Integration|x86'">
+    <OutputPath>bin\x86\Integration\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\x86\Release\RTF.Client.UI.QA.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'IntegrationFM|x86'">
+    <OutputPath>bin\x86\IntegrationFM\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\x86\Release\RTF.Client.UI.QA.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Caliburn.Micro">
+      <HintPath>..\Solution Items\Caliburn\Caliburn.Micro.dll</HintPath>
+    </Reference>
+    <Reference Include="Caliburn.Micro.Recipes.Filters.Framework">
+      <HintPath>..\Solution Items\Caliburn\Caliburn.Micro.Recipes.Filters.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="InfragisticsWPF4.DataPresenter.v10.2, Version=10.2.20102.1014, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <HintPath>..\Solution Items\Infragistics\InfragisticsWPF4.DataPresenter.v10.2.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="InfragisticsWPF4.Editors.v10.2, Version=10.2.20102.1014, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <HintPath>..\Solution Items\Infragistics\InfragisticsWPF4.Editors.v10.2.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="InfragisticsWPF4.OutlookBar.v10.2, Version=10.2.20102.1014, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <HintPath>..\Solution Items\Infragistics\InfragisticsWPF4.OutlookBar.v10.2.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="InfragisticsWPF4.v10.2, Version=10.2.20102.1014, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <HintPath>..\Solution Items\Infragistics\InfragisticsWPF4.v10.2.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\Solution Items\EntLib50\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.ExceptionHandling, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\Solution Items\EntLib50\Microsoft.Practices.EnterpriseLibrary.ExceptionHandling.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.ExceptionHandling.Logging, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\Solution Items\EntLib50\Microsoft.Practices.EnterpriseLibrary.ExceptionHandling.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Logging, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\Solution Items\EntLib50\Microsoft.Practices.EnterpriseLibrary.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework.Aero" />
+    <Reference Include="SWAT.Data.Validation, Version=1.0.1.1, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Solution Items\SWAT\SWAT.Data.Validation.dll</HintPath>
+    </Reference>
+    <Reference Include="SWAT.Service.Client">
+      <HintPath>..\Solution Items\SWAT\SWAT.Service.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="SWAT.Service.Common">
+      <HintPath>..\Solution Items\SWAT\SWAT.Service.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Interactivity">
+      <HintPath>..\Solution Items\Mvvm Light Toolkit\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WPFToolkit.Extended">
+      <HintPath>..\Solution Items\WPFToolKit\WPFToolkit.Extended.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="..\Solution Items\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="AppBootstrapper.cs" />
+    <Compile Include="Framework\Behaviors\FocusBehavior.cs" />
+    <Compile Include="Framework\Converter\BoolToFontWeightConverter.cs" />
+    <Compile Include="Framework\Converter\BoolToOppositeBoolConverter.cs" />
+    <Compile Include="Framework\Converter\BoolToStringActivateDeactivateConverter.cs" />
+    <Compile Include="Framework\Converter\BoolToStringSignConverter.cs" />
+    <Compile Include="Framework\Converter\NullToVisibilityConverter.cs" />
+    <Compile Include="Framework\Converter\StringArrayMultiConvertor.cs" />
+    <Compile Include="Framework\Converter\ValueConverterGroup.cs" />
+    <Compile Include="Framework\Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Framework\Filters\BusyAttribute.cs" />
+    <Compile Include="Framework\IBaseBinAlertContainer.cs" />
+    <Compile Include="Framework\IDashboard.cs" />
+    <Compile Include="Framework\ILogin.cs" />
+    <Compile Include="Framework\IMessage.cs" />
+    <Compile Include="Framework\INavigationScreen.cs" />
+    <Compile Include="Framework\INavigationScreenMetadata.cs" />
+    <Compile Include="Framework\IShell.cs" />
+    <Compile Include="Framework\Messages\SaveBinAlert.cs" />
+    <Compile Include="Framework\Messages\ExitEvent.cs" />
+    <Compile Include="Framework\Messages\LoginEvent.cs" />
+    <Compile Include="Framework\NavigationScreenAttribute.cs" />
+    <Compile Include="Framework\PresentationFramework\NavigationScreen.cs" />
+    <Compile Include="Framework\Validation\Editors.cs" />
+    <Compile Include="Framework\Validation\NumericRule.cs" />
+    <Compile Include="Helpers\DataChange.cs" />
+    <Compile Include="Helpers\DoubleClickEventArgs.cs" />
+    <Compile Include="Helpers\DataChanging.cs" />
+    <Compile Include="Helpers\DataChangingEventArgs.cs" />
+    <Compile Include="Helpers\DoubleClick.cs" />
+    <Compile Include="Helpers\GenericComparer.cs" />
+    <Compile Include="Helpers\Helper.cs" />
+    <Compile Include="Helpers\ListBoxExtenders.cs" />
+    <Compile Include="Helpers\RoutedAdapter.cs" />
+    <Compile Include="Helpers\RoutedEventHandler.cs" />
+    <Compile Include="Helpers\SelectedItems.cs" />
+    <Compile Include="Helpers\PasswordHelper.cs" />
+    <Compile Include="Mocks\BinAlertsViewModelMock.cs" />
+    <Compile Include="Mocks\DashboardViewModelMock.cs" />
+    <Compile Include="Mocks\BinDefinitionMock.cs" />
+    <Compile Include="Mocks\DetailMessagesBinAlertEditorViewModelMock.cs" />
+    <Compile Include="Mocks\DetailMessagesViewModelMock.cs" />
+    <Compile Include="Mocks\EquipmentCollectionMock.cs" />
+    <Compile Include="Mocks\GeneralBinAlertEditorViewModelMock.cs" />
+    <Compile Include="Mocks\GeneralMessagesViewModelMock.cs" />
+    <Compile Include="Mocks\LoginViewModelMock.cs" />
+    <Compile Include="Mocks\RuleCheckViewModelMock.cs" />
+    <Compile Include="Mocks\TestersViewModelMock.cs" />
+    <Compile Include="Mocks\HandlersViewModelMock.cs" />
+    <Compile Include="Model\Consts.cs" />
+    <Compile Include="Services\BinAlertConfigurationServiceHandler.cs" />
+    <Compile Include="ViewModels\BaseBinAlertEditorChangeTrackerViewModel.cs" />
+    <Compile Include="ViewModels\BaseBinAlertEditorViewModel.cs" />
+    <Compile Include="ViewModels\BaseBinDefinitionViewModel.cs" />
+    <Compile Include="ViewModels\BinAlertEditorViewModel.cs" />
+    <Compile Include="ViewModels\BinAlertEquipmentBinAlertDetailedEditorViewModel.cs" />
+    <Compile Include="ViewModels\BinAlertEquipmentBinAlertEditorViewModel.cs" />
+    <Compile Include="ViewModels\BinAlertsViewModel.cs" />
+    <Compile Include="ViewModels\BinDefinitionBinAlertEditorViewModel.cs" />
+    <Compile Include="ViewModels\BinDefinitionListViewModel.cs" />
+    <Compile Include="ViewModels\BinDefinitionRangeViewModel.cs" />
+    <Compile Include="ViewModels\DashboardViewModel.cs" />
+    <Compile Include="ViewModels\DetailMessagesBinAlertEditorViewModel.cs" />
+    <Compile Include="ViewModels\DetailMessagesViewModel.cs" />
+    <Compile Include="ViewModels\DetaliedMessagesBinAlertDetailedEditorViewModel.cs" />
+    <Compile Include="ViewModels\GeneralBinAlertEditorViewModel.cs" />
+    <Compile Include="ViewModels\GeneralMessageBinAlertDetailedEditorViewModel.cs" />
+    <Compile Include="ViewModels\GeneralMessageBinAlertEditorViewModel.cs" />
+    <Compile Include="ViewModels\GeneralMessageViewModel.cs" />
+    <Compile Include="ViewModels\GridViewerViewModel.cs" />
+    <Compile Include="ViewModels\HandlersViewModel.cs" />
+    <Compile Include="Helpers\Searilzer.cs" />
+    <Compile Include="Framework\OpenTabEvent.cs" />
+    <Compile Include="Framework\IBaseBinAlertEditorViewModel.cs" />
+    <Compile Include="ViewModels\LoginViewModel.cs" />
+    <Compile Include="ViewModels\MainBinAlertEditorViewModel.cs" />
+    <Compile Include="Mocks\MainBinAlertEditorViewModelMock.cs" />
+    <Compile Include="ViewModels\RuleCheckViewModel.cs" />
+    <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="ViewModels\SimpleEditorViewModel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ViewModels\TestersViewModel.cs" />
+    <Compile Include="Views\BinAlertEditorView.xaml.cs">
+      <DependentUpon>BinAlertEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BinAlertEquipmentBinAlertDetailedEditorView.xaml.cs">
+      <DependentUpon>BinAlertEquipmentBinAlertDetailedEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BinAlertEquipmentBinAlertEditorView.xaml.cs">
+      <DependentUpon>BinAlertEquipmentBinAlertEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BinAlertsView.xaml.cs">
+      <DependentUpon>BinAlertsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BinDefinitionBinAlertEditorView.xaml.cs">
+      <DependentUpon>BinDefinitionBinAlertEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BinDefinitionListView.xaml.cs">
+      <DependentUpon>BinDefinitionListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BinDefinitionRangeView.xaml.cs">
+      <DependentUpon>BinDefinitionRangeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DetailMessagesBinAlertEditorView.xaml.cs">
+      <DependentUpon>DetailMessagesBinAlertEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DetailMessagesView.xaml.cs">
+      <DependentUpon>DetailMessagesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DetaliedMessagesBinAlertDetailedEditorView.xaml.cs">
+      <DependentUpon>DetaliedMessagesBinAlertDetailedEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GeneralBinAlertEditorView.xaml.cs">
+      <DependentUpon>GeneralBinAlertEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GeneralMessageBinAlertDetailedEditorView.xaml.cs">
+      <DependentUpon>GeneralMessageBinAlertDetailedEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GeneralMessageBinAlertEditorView.xaml.cs">
+      <DependentUpon>GeneralMessageBinAlertEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GeneralMessageView.xaml.cs">
+      <DependentUpon>GeneralMessageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HandlersView.xaml.cs">
+      <DependentUpon>HandlersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LoginView.xaml.cs">
+      <DependentUpon>LoginView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainBinAlertEditorView.xaml.cs">
+      <DependentUpon>MainBinAlertEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RuleCheckView.xaml.cs">
+      <DependentUpon>RuleCheckView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DashboardView.xaml.cs">
+      <DependentUpon>DashboardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ShellView.xaml.cs">
+      <DependentUpon>ShellView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TestersView.xaml.cs">
+      <DependentUpon>TestersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Assets\Styles\BusyIndicator.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
+    </Page>
+    <Page Include="Skins\MainSkin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\BinAlertEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BinAlertEquipmentBinAlertDetailedEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BinAlertEquipmentBinAlertEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BinAlertsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BinDefinitionBinAlertEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BinDefinitionListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BinDefinitionRangeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DetailMessagesBinAlertEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DetailMessagesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DetaliedMessagesBinAlertDetailedEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GeneralBinAlertEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GeneralMessageBinAlertDetailedEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GeneralMessageBinAlertEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GeneralMessageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\HandlersView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LoginView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainBinAlertEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RuleCheckView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DashboardView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ShellView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TestersView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="App.Debug.config">
+      <DependentUpon>App.config</DependentUpon>
+    </None>
+    <None Include="App.Integration.config">
+      <DependentUpon>App.config</DependentUpon>
+    </None>
+    <None Include="App.IntegrationFM.config">
+      <DependentUpon>App.config</DependentUpon>
+    </None>
+    <None Include="App.Release.config">
+      <DependentUpon>App.config</DependentUpon>
+    </None>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <None Include="SwatCert.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RTF.Client.Facade\RTF.Client.Facade.csproj">
+      <Project>{C45CDCB4-D610-4271-BC80-604546CD28C6}</Project>
+      <Name>RTF.Client.Facade</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RTF.Common\RTF.Common.csproj">
+      <Project>{3EDD3DDE-A0CB-495D-98B3-D28263AF9B56}</Project>
+      <Name>RTF.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RTF.Logging\RTF.Logging.csproj">
+      <Project>{4CBD9B55-491C-4336-93D2-CB25C3D5D156}</Project>
+      <Name>RTF.Logging</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Images\Alert.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll" />
+  <Target Name="AfterCompile" Condition="Exists('App.$(Configuration).config')">
+    <!-- Generate transformed app config in the intermediate directory -->
+    <TransformXml Source="App.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="App.$(Configuration).config" />
+    <!-- Force build process to use the transformed configuration file from now on. -->
+    <ItemGroup>
+      <AppConfigWithTargetPath Remove="App.config" />
+      <AppConfigWithTargetPath Include="$(IntermediateOutputPath)$(TargetFileName).config">
+        <TargetPath>$(TargetFileName).config</TargetPath>
+      </AppConfigWithTargetPath>
+    </ItemGroup>
+  </Target>
+  <!--        
+  Override After Publish to support ClickOnce
+  AfterPublish target replaces the untransformed config file copied to the
+  deployment directory with the transformed one  
+  -->
+  <Target Name="AfterPublish">
+    <PropertyGroup>
+      <DeployedConfig>$(_DeploymentApplicationDir)$(TargetName)$(TargetExt).config$(_DeploymentFileMappingExtension)</DeployedConfig>
+    </PropertyGroup>
+    <!-- Publish copies the unstransformed App.config to deployment directory so overwrite it -->
+    <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
+  </Target>
+</Project>
