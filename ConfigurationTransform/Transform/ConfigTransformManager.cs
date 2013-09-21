@@ -19,9 +19,12 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 <configuration xmlns:xdt=""http://schemas.microsoft.com/XML-Document-Transform"">
 </configuration>";
 
-        public static bool EditProjectFile(string appConfigName, Project project, ProjectItem projectItem)
+        //public static bool EditProjectFile(string appConfigName, Project project, ProjectItem projectItem)
+        public static bool EditProjectFile(ProjectItem projectItem)
         {
-            var dte = project.DTE;
+            var appConfigName = projectItem.Name;
+            // get dte from project item
+            var dte = projectItem.DTE;
             try
             {
                 // hide UI changes
@@ -29,14 +32,17 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
                 var isLinkAppConfig = projectItem.IsLink();
 
+                var project = projectItem.ContainingProject;
                 //TODO:[Golan] - finish
                 // check if its linked config
                 if (isLinkAppConfig)
                 {
-                    CreateLinkedAppConfigFiles(projectItem, project);
+                    // since it's link files we only need to copy them as like files to project
+                    CreateLinkedAppConfigFiles(projectItem);
                 }
                 else
                 {
+
                     var buildConfigurationNames = project.GetBuildConfigurationNames();
                     //var parent = Directory.GetParent(fileName).FullName;
                     // create missing config files
@@ -72,7 +78,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         }
 
         //TODO: unit testing
-        private static void CreateLinkedAppConfigFiles(ProjectItem targetProjectItem, Project targetProject)
+        public static void CreateLinkedAppConfigFiles(ProjectItem targetProjectItem)
         {
             // get source root config project item
             var sourceRootConfig = targetProjectItem.GetProjectItemContainingFullPath();
@@ -93,6 +99,8 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                     targetProjectItem.ProjectItems.AddFromFile(sourceFullPath);
                 }
             }
+            // get item containing project
+            var targetProject = targetProjectItem.ContainingProject;
             // save target project file
             if (targetProject.IsDirty) targetProject.Save();
         }

@@ -75,10 +75,6 @@ namespace GolanAvraham.ConfigurationTransform
         }
         #endregion
 
-        //private SelectedItem _selectedItem;
-
-        private string _selectedFileName;
-        private Project _selectedProject;
         private ProjectItem _selectedProjectItem;
 
         // check if we need to display config transform in context menu
@@ -94,12 +90,11 @@ namespace GolanAvraham.ConfigurationTransform
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
                 // store app config name
-                _selectedFileName = _selectedProjectItem.Name;
 
-                if (ConfigTransformManager.IsRootAppConfig(_selectedFileName))
+                if (ConfigTransformManager.IsRootAppConfig(_selectedProjectItem.Name))
                 {
                     // cache selected config project
-                    _selectedProject = _selectedProjectItem.ContainingProject;
+                    //_selectedProject = _selectedProjectItem.ContainingProject;
                     menuCommand.Visible = true;
                     //var isLinkAppConfig = _selectedProjectItem.IsLink();
 
@@ -156,7 +151,7 @@ namespace GolanAvraham.ConfigurationTransform
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            var editProjectFile = ConfigTransformManager.EditProjectFile(_selectedFileName, _selectedProject, _selectedProjectItem);
+            var editProjectFile = ConfigTransformManager.EditProjectFile(_selectedProjectItem);
             const string reloadMessage = @"Changes were made in project file.";
             const string noChangeMessage = @"No changes were made.";
             var displayMessage = editProjectFile ? reloadMessage : noChangeMessage;
