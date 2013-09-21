@@ -16,25 +16,11 @@ namespace ConfigurationTransform.Test
         private static readonly XElement ProjectWithLinkFiles;
         private static readonly XElement ProjectWithoutLinkFiles;
 
-        private static string GetFileInUpper(string fileName, string startingFolder)
-        {
-            if (string.IsNullOrWhiteSpace(startingFolder))
-            {
-                throw new FileNotFoundException(fileName);
-            }
-            var combine = Path.Combine(startingFolder, fileName);
-            if (File.Exists(combine))
-            {
-                return combine;
-            }
-            return GetFileInUpper(fileName, Directory.GetParent(startingFolder).FullName);
-        }
-
         static VsProjectXmlTransformTest()
         {
-            var name = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            ProjectWithLinkFiles = XElement.Load(GetFileInUpper("TestProjectWithLinkFiles.xml", name));
-            ProjectWithoutLinkFiles = XElement.Load(GetFileInUpper("TestProject.xml", name));
+            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            ProjectWithLinkFiles = XElement.Load(Path.Combine(root, "TestProjectWithLinkFiles.xml"));
+            ProjectWithoutLinkFiles = XElement.Load(Path.Combine(root, "TestProject.xml"));
         }
 
         [TestMethod]
