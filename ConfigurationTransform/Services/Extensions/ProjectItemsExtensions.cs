@@ -79,15 +79,5 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             }
             return null;
         }
-
-        //public static ProjectItem GetProjectItemHavingProperties(this ProjectItems source, Predicate<FileProperties2> predicate)
-        //{
-        //    if (predicate == null)
-        //    {
-        //        throw new ArgumentNullException("predicate");
-        //    }
-
-        //    return source.AsEnumerable().FirstOrDefault(item => item.GetHavingProperties(predicate) != null);
-        //}
     }
 }

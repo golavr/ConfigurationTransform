@@ -73,28 +73,5 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
                     properties.GetIsLink() == isLink);
 
         }
-
-        //public static bool IsHavingProperties(this ProjectItem source, Predicate<FileProperties2> predicate)
-        //{
-        //    if (predicate == null)
-        //    {
-        //        throw new ArgumentNullException("predicate");
-        //    }
-        //    var isHavingProperties = predicate.Invoke(source.Properties.AsFileProperties());
-        //    return isHavingProperties;
-        //}
-
-        //public static ProjectItem GetHavingProperties(this ProjectItem source, Predicate<FileProperties2> predicate)
-        //{
-        //    if (predicate == null)
-        //    {
-        //        throw new ArgumentNullException("predicate");
-        //    }
-        //    // check current leaf
-        //    var havingProperties = source.IsHavingProperties(predicate);
-        //    if (havingProperties) return source;
-        //    // check branch
-        //    return source.ProjectItems.GetProjectItemHavingProperties(predicate);
-        //}
     }
 }

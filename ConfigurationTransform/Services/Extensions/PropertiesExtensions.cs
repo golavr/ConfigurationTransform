@@ -28,15 +28,5 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             var value = source.GetPropertyValue<bool>("IsLink");
             return value;
         }
-
-        //public static IEnumerable<FileProperties> AsFileProperties(this Properties source)
-        //{
-        //    return source.Cast<FileProperties>();
-        //}
-
-        //public static FileProperties2 AsFileProperties(this Properties source)
-        //{
-        //    return (FileProperties2)source;
-        //}
     }
 }

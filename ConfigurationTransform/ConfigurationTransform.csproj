@@ -106,7 +106,6 @@
     <Compile Include="Services\Extensions\PropertyExtensions.cs" />
     <Compile Include="Services\Extensions\SelectedItemsExtensions.cs" />
     <Compile Include="Services\Extensions\VsServicesExtensions.cs" />
-    <Compile Include="Services\Implementations\PropertyClass.cs" />
     <Compile Include="Services\IVsServices.cs" />
     <Compile Include="Services\Extensions\ProjectItemExtensions.cs" />
     <Compile Include="Transform\ConfigTransformManager.cs" />

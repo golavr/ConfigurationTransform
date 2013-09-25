@@ -54,18 +54,5 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             }
             return null;
         }
-
-        //TODO:[Golan] - remove
-        //public static ProjectItem GetProjectItemHavingProperties(this DTE2 dte,
-        //                                                         Predicate<FileProperties2> predicate)
-        //{
-        //    var itemHavingProperties =
-        //        dte.Solution.Projects.AsEnumerable()
-        //           .Select(project => project.ProjectItems)
-        //           .Select(projectItems => projectItems.GetProjectItemHavingProperties(predicate))
-        //           .FirstOrDefault(projectItemHavingProperties => projectItemHavingProperties != null);
-
-        //    return itemHavingProperties;
-        //}
     }
 }
