@@ -48,7 +48,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             {
                 throw new ArgumentNullException("predicate");
             }
-            var isHavingProperties = predicate.Invoke(source.Properties.AsEnumerable());
+            var isHavingProperties = predicate(source.Properties.AsEnumerable());
             return isHavingProperties;
         }
 
@@ -58,7 +58,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             {
                 throw new ArgumentNullException("predicate");
             }
-            var isHavingProperties = predicate.Invoke(source.Properties);
+            var isHavingProperties = predicate(source.Properties);
             return isHavingProperties;
         }
 
@@ -66,7 +66,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
         {
             // get target app.config full path
             var projectItemFullPath = source.GetFullPath();
-            var dte = (DTE2)source.DTE;
+            var dte = (DTE)source.DTE;
             return
                 dte.GetProjectItemHavingProperties(properties =>
                     properties.GetFullPath() == projectItemFullPath &&

@@ -2,24 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
-using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 
 namespace GolanAvraham.ConfigurationTransform.Services.Extensions
 {
     public static class DTEExtensions
     {
-        public static DTE2 GetInstance()
+        public static DTE GetInstance()
         {
-            return (DTE2)Package.GetGlobalService(typeof(DTE));
+            return (DTE)Package.GetGlobalService(typeof(DTE));
         }
 
-        public static SelectedItem GetSelectedItem(this DTE2 dte)
+        public static SelectedItem GetSelectedItem(this DTE dte)
         {
             return dte.SelectedItems.AsEnumerable().Single();
         }
 
-        public static Project FindProjectByProjectItemProperties(this DTE2 dte,
+        public static Project FindProjectByProjectItemProperties(this DTE dte,
                                                                  Predicate<IEnumerable<Property>> predicate)
         {
             var projects = dte.Solution.Projects.AsEnumerable();
@@ -28,7 +27,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             return project;
         }
 
-        public static ProjectItem GetProjectItemHavingProperties(this DTE2 dte,
+        public static ProjectItem GetProjectItemHavingProperties(this DTE dte,
                                                                  Predicate<IEnumerable<Property>> predicate)
         {
             foreach (
@@ -42,7 +41,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             return null;
         }
 
-        public static ProjectItem GetProjectItemHavingProperties(this DTE2 dte,
+        public static ProjectItem GetProjectItemHavingProperties(this DTE dte,
                                                          Predicate<Properties> predicate)
         {
             foreach (

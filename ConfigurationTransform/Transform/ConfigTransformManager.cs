@@ -19,7 +19,6 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 <configuration xmlns:xdt=""http://schemas.microsoft.com/XML-Document-Transform"">
 </configuration>";
 
-        //public static bool EditProjectFile(string appConfigName, Project project, ProjectItem projectItem)
         public static bool EditProjectFile(ProjectItem projectItem)
         {
             var appConfigName = projectItem.Name;
@@ -33,7 +32,6 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 var isLinkAppConfig = projectItem.IsLink();
 
                 var project = projectItem.ContainingProject;
-                //TODO:[Golan] - finish
                 // check if its linked config
                 if (isLinkAppConfig)
                 {
@@ -42,7 +40,6 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 }
                 else
                 {
-
                     var buildConfigurationNames = project.GetBuildConfigurationNames();
                     //var parent = Directory.GetParent(fileName).FullName;
                     // create missing config files
@@ -77,15 +74,12 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             }
         }
 
-        //TODO: unit testing
         public static void CreateLinkedAppConfigFiles(ProjectItem targetProjectItem)
         {
             // get source root config project item
             var sourceRootConfig = targetProjectItem.GetProjectItemContainingFullPath();
-            //var sourceRootConfig =
-            //    VsServices.Instance.Dte.GetProjectItemHavingProperties(
-            //        p1 => p1.IsLink && p1.FullPath == targetRootConfigFullPath);
-            //var sourceRootConfig = VsServices.Instance.Dte.GetProjectItemHavingProperties<IEquatable<FileProperties>>(enumerable => enumerable.);
+
+            if (sourceRootConfig.ProjectItems == null) return;
             // iterate source root config items
             foreach (var item in sourceRootConfig.ProjectItems.AsEnumerable())
             {
