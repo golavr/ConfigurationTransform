@@ -27,8 +27,9 @@ namespace ConfigurationTransform.Test
         public void TryGetIncludeConfigElement_Returns_True()
         {
             //Arrange
-            var target = new Mock<VsProjectXmlTransformMock>("");
+            var target = new Mock<VsProjectXmlTransformMock>() { CallBase = true };
             target.Protected().Setup<XElement>("LoadProjectFile").Returns(ProjectWithoutLinkFiles);
+            target.Object.Open("");
             const string appConfigName = "App.config";
             XElement element;
 
@@ -43,8 +44,9 @@ namespace ConfigurationTransform.Test
         public void HasTransformTask_Returns_True()
         {
             //Arrange
-            var target = new Mock<VsProjectXmlTransformMock>("");
+            var target = new Mock<VsProjectXmlTransformMock>() { CallBase = true };
             target.Protected().Setup<XElement>("LoadProjectFile").Returns(ProjectWithoutLinkFiles);
+            target.Object.Open("");
 
             //Act
             var actual = target.Object.HasTransformTask();
@@ -57,8 +59,9 @@ namespace ConfigurationTransform.Test
         public void HasAfterPublishTarget_Returns_True()
         {
             //Arrange
-            var target = new Mock<VsProjectXmlTransformMock>("");
+            var target = new Mock<VsProjectXmlTransformMock>() { CallBase = true };
             target.Protected().Setup<XElement>("LoadProjectFile").Returns(ProjectWithoutLinkFiles);
+            target.Object.Open("");
 
             //Act
             var actual = target.Object.HasAfterPublishTarget();
@@ -71,8 +74,9 @@ namespace ConfigurationTransform.Test
         public void HasAfterCompileTarget_Returns_True()
         {
             //Arrange
-            var target = new Mock<VsProjectXmlTransformMock>("");
+            var target = new Mock<VsProjectXmlTransformMock>(){ CallBase = true};
             target.Protected().Setup<XElement>("LoadProjectFile").Returns(ProjectWithoutLinkFiles);
+            target.Object.Open("");
             const string condition = @"Exists('App.$(Configuration).config')";
 
             //Act
@@ -86,8 +90,9 @@ namespace ConfigurationTransform.Test
         public void HasDependentUponConfig_Returns_True()
         {
             //Arrange
-            var target = new Mock<VsProjectXmlTransformMock>("");
+            var target = new Mock<VsProjectXmlTransformMock>() { CallBase = true };
             target.Protected().Setup<XElement>("LoadProjectFile").Returns(ProjectWithoutLinkFiles);
+            target.Object.Open("");
             const string buildConfig = "App.Debug.config";
 
             //Act
@@ -101,8 +106,9 @@ namespace ConfigurationTransform.Test
         public void HasDependentUponConfigLink_Returns_True()
         {
             //Arrange
-            var target = new Mock<VsProjectXmlTransformMock>("");
+            var target = new Mock<VsProjectXmlTransformMock>() { CallBase = true };
             target.Protected().Setup<XElement>("LoadProjectFile").Returns(ProjectWithLinkFiles);
+            target.Object.Open("");
             const string buildConfig = "App.Debug.config";
 
             //Act
@@ -116,8 +122,9 @@ namespace ConfigurationTransform.Test
         public void HasDependentUponConfigLink_Returns_False()
         {
             //Arrange
-            var target = new Mock<VsProjectXmlTransformMock>("");
+            var target = new Mock<VsProjectXmlTransformMock>() { CallBase = true };
             target.Protected().Setup<XElement>("LoadProjectFile").Returns(ProjectWithoutLinkFiles);
+            target.Object.Open("");
             const string buildConfig = "App.Debug.config";
 
             //Act
@@ -133,10 +140,10 @@ namespace ConfigurationTransform.Test
     /// </summary>
     public class VsProjectXmlTransformMock : VsProjectXmlTransform
     {
-        public VsProjectXmlTransformMock(string fileName)
-            : base(fileName)
-        {
-        }
+        //public VsProjectXmlTransformMock(string fileName)
+        //    : base(fileName)
+        //{
+        //}
 
         public bool HasTransformTask()
         {

@@ -26,9 +26,29 @@ namespace GolanAvraham.ConfigurationTransform.Services
         {
         }
 
-        public void ShowMessageBox(string title, string messageFormat, params object[] messageArgs)
+        //public void ShowMessageBox(string title, string messageFormat, params object[] messageArgs)
+        //{
+        //    var message = string.Format(messageFormat, messageArgs);
+        //    var uiShell = (IVsUIShell)Package.GetGlobalService(typeof(SVsUIShell));
+        //    var clsid = Guid.Empty;
+        //    int result;
+        //    ErrorHandler.ThrowOnFailure(uiShell.ShowMessageBox(
+        //               0,
+        //               ref clsid,
+        //               title,
+        //               message,
+        //               string.Empty,
+        //               0,
+        //               OLEMSGBUTTON.OLEMSGBUTTON_OK,
+        //               OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
+        //               OLEMSGICON.OLEMSGICON_INFO,
+        //               0,        // false
+        //               out result));
+        //}
+
+
+        public int ShowMessageBox(string title, string message, OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGICON icon = OLEMSGICON.OLEMSGICON_INFO)
         {
-            var message = string.Format(messageFormat, messageArgs);
             var uiShell = (IVsUIShell)Package.GetGlobalService(typeof(SVsUIShell));
             var clsid = Guid.Empty;
             int result;
@@ -39,11 +59,12 @@ namespace GolanAvraham.ConfigurationTransform.Services
                        message,
                        string.Empty,
                        0,
-                       OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                       buttons,
                        OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
-                       OLEMSGICON.OLEMSGICON_INFO,
+                       icon,
                        0,        // false
                        out result));
+            return result;
         }
     }
 }

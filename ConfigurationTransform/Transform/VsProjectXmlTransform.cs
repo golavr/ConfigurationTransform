@@ -7,10 +7,21 @@ using System.Xml.Linq;
 
 namespace GolanAvraham.ConfigurationTransform.Transform
 {
-    public class VsProjectXmlTransform
+    public interface IVsProjectXmlTransform
     {
-        private readonly string _fileName;
-        private readonly XElement _projectRoot;
+        void Open(string fileName);
+        bool Save();
+        void AddDependentUponConfig(string buildConfigurationName, string appConfigName);
+        void AddDependentUponConfig(string[] buildConfigurationNames, string appConfigName);
+        void AddTransformTask();
+        void AddAfterCompileTarget(string appConfigName, string relativePrefix = null);
+        void AddAfterPublishTarget(string appConfigName);
+    }
+
+    public class VsProjectXmlTransform : IVsProjectXmlTransform
+    {
+        private string _fileName;
+        private XElement _projectRoot;
         private bool _isDirty;
 
         private static readonly XNamespace Namespace = "http://schemas.microsoft.com/developer/msbuild/2003";
@@ -21,12 +32,19 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         private const string TransformAssemblyFile =
             @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll";
 
-        public VsProjectXmlTransform(string fileName)
+        public virtual void Open(string fileName)
         {
             _fileName = fileName;
-
+            _isDirty = false;
             _projectRoot = LoadProjectFile();
         }
+
+        //public VsProjectXmlTransform(string fileName)
+        //{
+        //    _fileName = fileName;
+
+        //    _projectRoot = LoadProjectFile();
+        //}
 
         protected virtual XElement LoadProjectFile()
         {
@@ -115,7 +133,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             return element != null;
         }
 
-        public void AddTransformTask(string appConfigName)
+        public void AddTransformTask()
         {
             // check if already exists
             if (HasTransformTask()) return;
@@ -128,15 +146,16 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             _projectRoot.Add(usingTaskNode);
         }
 
-        public void AddAfterCompileTarget(string appConfigName)
+        public void AddAfterCompileTarget(string appConfigName, string relativePrefix = null)
         {
             var appConfigSplit = appConfigName.Split('.');
             var configName = appConfigSplit[0];
             var configExt = appConfigSplit[1];
             // App.$(Configuration).config
-            var configFormat = string.Format("{0}.$(Configuration).{1}", configName, configExt);
+            var configFormat = string.Format("{0}{1}.$(Configuration).{2}", relativePrefix, configName, configExt);
             var condition = string.Format("Exists('{0}')", configFormat);
 
+            var appConfigWithPrefix = string.Format("{0}{1}", relativePrefix, appConfigName);
             // check if already exists
             if (HasAfterCompileTarget(condition)) return;
             _isDirty = true;
@@ -148,7 +167,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                                          new XAttribute("Name", "AfterCompile"),
                                          new XAttribute("Condition", condition),
                                          new XComment(generateComment),
-                                         CreateElement("TransformXml", new XAttribute("Source", appConfigName),
+                                         CreateElement("TransformXml", new XAttribute("Source", appConfigWithPrefix),
                                                       new XAttribute("Destination", destination),
                                                       new XAttribute("Transform", configFormat)),
                                          new XComment(forceComment),
@@ -222,6 +241,20 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                                              none.ElementsAnyNs("Link").Any(link => link.Value == buildConfig) &&
                                              none.ElementsAnyNs("DependentUpon").Any()));
         }
+
+        //protected virtual string GetRootConfigPath(string configName)
+        //{
+        //    var any =
+        //        _projectRoot.ElementsAnyNs("ItemGroup")
+        //                    .Where(
+        //                        itemGroup =>
+        //                        itemGroup.HasElements &&
+        //                        itemGroup.ElementsAnyNs("None")
+        //                                 .Any(
+        //                                     none =>
+        //                                     none.HasAttributes && none.Attributes("Include").Any() && none.HasElements &&
+        //                                     none.ElementsAnyNs("Link").Any(link => link.Value == configName)));
+        //}
 
         protected virtual bool HasTransformTask()
         {

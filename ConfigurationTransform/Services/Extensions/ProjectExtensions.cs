@@ -8,7 +8,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
     {
         public static int GetProjectOutputType(this Project source)
         {
-            return (int)source.Properties.Item("OutputType").Value;
+            return source.Properties.GetPropertyValue<int>("OutputType");
         }
 
         public static bool IsProjectOutputTypeExecutable(this Project source)

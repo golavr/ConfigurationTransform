@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using EnvDTE;
 using GolanAvraham.ConfigurationTransform.Services;
 using GolanAvraham.ConfigurationTransform.Services.Extensions;
+using Microsoft.VisualStudio.Shell.Interop;
+using Constants = EnvDTE.Constants;
 
 namespace GolanAvraham.ConfigurationTransform.Transform
 {
@@ -19,9 +21,25 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 <configuration xmlns:xdt=""http://schemas.microsoft.com/XML-Document-Transform"">
 </configuration>";
 
+        /// <summary>
+        /// replaceable vs service for testing.
+        /// </summary>
+        public static IVsServices VsService { get; set; }
+
+        public static IVsProjectXmlTransform ProjectXmlTransform { get; set; }
+
+        static ConfigTransformManager()
+        {
+            // add default vs service
+            VsService = VsServices.Instance;
+            ProjectXmlTransform = new VsProjectXmlTransform();
+        }
+
         public static bool EditProjectFile(ProjectItem projectItem)
         {
             var appConfigName = projectItem.Name;
+            string relativePrefix = null;
+
             // get dte from project item
             var dte = projectItem.DTE;
             try
@@ -35,32 +53,42 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 // check if its linked config
                 if (isLinkAppConfig)
                 {
-                    // since it's link files we only need to copy them as like files to project
-                    CreateLinkedAppConfigFiles(projectItem);
+                    // display yes/no message to user. yes - add as lined configs; no - add as concrete configs
+                    var result = VsService.ShowMessageBox("Add as linked conifg?",
+                                                          OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
+                                                          OLEMSGICON.OLEMSGICON_QUERY);
+                    if (result == 6)
+                    {
+                        // since it's link files we only need to copy them as like files to project
+                        CreateLinkedAppConfigFiles(projectItem);
+                        relativePrefix = projectItem.GetRelativeDirectory();
+                    }
+                    else
+                    {
+                        // create missing config files
+                        CreateAppConfigFiles(project, projectItem, appConfigName);
+                    }
                 }
-                else
+                else    
                 {
-                    var buildConfigurationNames = project.GetBuildConfigurationNames();
-                    //var parent = Directory.GetParent(fileName).FullName;
                     // create missing config files
-                    CreateAppConfigFiles(project, projectItem, appConfigName, buildConfigurationNames);//, parent);
-                    // edit project file: add transform configs, transform task and compile transform task
-                    //vsProjectXml.AddDependentUponConfig(buildConfigurationNames, appConfigName);
+                    CreateAppConfigFiles(project, projectItem, appConfigName);
                 }
 
                 var fileName = project.FullName;
-                var vsProjectXml = new VsProjectXmlTransform(fileName);
+                ProjectXmlTransform.Open(fileName);
+                //var vsProjectXml = new VsProjectXmlTransform(fileName);
 
-                vsProjectXml.AddTransformTask(appConfigName);
-                vsProjectXml.AddAfterCompileTarget(appConfigName);
+                ProjectXmlTransform.AddTransformTask();
+                ProjectXmlTransform.AddAfterCompileTarget(appConfigName, relativePrefix);
                 // project is a windows application or console application? if so add click once transform task
                 if (project.IsProjectOutputTypeExecutable())
                 {
-                    vsProjectXml.AddAfterPublishTarget(appConfigName);
+                    ProjectXmlTransform.AddAfterPublishTarget(appConfigName);
                 }
 
                 // save project file
-                var isSaved = vsProjectXml.Save();
+                var isSaved = ProjectXmlTransform.Save();
                 // check if need to reload project
                 if (isSaved)
                 {
@@ -128,10 +156,19 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             if (selectedItems == null) return false;
             var selectedItem = selectedItems.GetValue(0) as UIHierarchyItem;
 
-            // is it the project we are looking for?
-            if (selectedItem.Name == projectName) return true;
-            // is it the root?
-            if (selectedItem.Name == solutionName) return false;
+            try
+            {
+                // is it the project we are looking for?
+                if (selectedItem.Name == projectName) return true;
+                // is it the root?
+                if (selectedItem.Name == solutionName) return false;
+            }
+                // suppress exceptions for items w/o names
+                // ReSharper disable EmptyGeneralCatchClause
+            catch
+                // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
             // move up in hierarchy
             solutionExplorer.SelectUp(vsUISelectionType.vsUISelectionTypeSelect, 1);
             return SelectProject(solutionExplorer, solutionName, projectName);
@@ -139,13 +176,14 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
         public static bool IsRootAppConfig(string fileName)
         {
-            if (!fileName.EndsWith(".config")) return false;
+            if (!fileName.EndsWith(".config", StringComparison.OrdinalIgnoreCase)) return false;
             if (fileName.Split('.').Length > 2) return false;
             return true;
         }
 
-        private static void CreateAppConfigFiles(Project project, ProjectItem projectItem, string appConfigName, IEnumerable<string> buildConfigurationNames)//, string path)
+        private static void CreateAppConfigFiles(Project project, ProjectItem projectItem, string appConfigName)//, IEnumerable<string> buildConfigurationNames)//, string path)
         {
+            var buildConfigurationNames = project.GetBuildConfigurationNames();
             var projectFileIsDirty = false;
             // get app.config directory. new transform config will be created there.
             //var path = projectItem.GetFullPath();

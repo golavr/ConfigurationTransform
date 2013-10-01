@@ -70,7 +70,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
                 if (isProjectItemPropertiesIncluded) return projectItem;
 
                 // check if branch
-                if (projectItem.ProjectItems.Count > 0)
+                if (projectItem.ProjectItems.AsEnumerable().Any())
                 {
                     // call self
                     var projectItemPropertiesIncluded = projectItem.ProjectItems.GetProjectItemHavingProperties(predicate);
