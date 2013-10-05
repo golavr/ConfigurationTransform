@@ -37,7 +37,6 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
         public static bool EditProjectFile(ProjectItem projectItem)
         {
-            var appConfigName = projectItem.Name;
             string relativePrefix = null;
 
             // get dte from project item
@@ -50,6 +49,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 var isLinkAppConfig = projectItem.IsLink();
 
                 var project = projectItem.ContainingProject;
+                var createAsLinkedConfig = false;
                 // check if its linked config
                 if (isLinkAppConfig)
                 {
@@ -57,42 +57,48 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                     var result = VsService.ShowMessageBox("Add as linked conifg?",
                                                           OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
                                                           OLEMSGICON.OLEMSGICON_QUERY);
-                    if (result == 6)
+
+                    // store relative path
+                    relativePrefix = projectItem.GetRelativeDirectory();
+                    if (result == MessageBoxResult.Yes)
                     {
-                        // since it's link files we only need to copy them as like files to project
-                        CreateLinkedAppConfigFiles(projectItem);
-                        relativePrefix = projectItem.GetRelativeDirectory();
-                    }
-                    else
-                    {
-                        // create missing config files
-                        CreateAppConfigFiles(project, projectItem, appConfigName);
+                        createAsLinkedConfig = true;
                     }
                 }
-                else    
+
+                if (createAsLinkedConfig)
+                {
+                    // since it's link files we only need to copy them as like files to project
+                    CreateLinkedAppConfigFiles(projectItem);
+                }
+                else
                 {
                     // create missing config files
-                    CreateAppConfigFiles(project, projectItem, appConfigName);
+                    CreateAppConfigFiles(project, projectItem);
                 }
 
+                // project file(e.g. c:\myproject\myproject.csproj)
                 var fileName = project.FullName;
-                ProjectXmlTransform.Open(fileName);
-                //var vsProjectXml = new VsProjectXmlTransform(fileName);
+                // app config name (e.g. app.config)
+                var appConfigName = projectItem.Name;
 
+                ProjectXmlTransform.Open(fileName);
                 ProjectXmlTransform.AddTransformTask();
-                ProjectXmlTransform.AddAfterCompileTarget(appConfigName, relativePrefix);
+                ProjectXmlTransform.AddAfterCompileTarget(appConfigName, relativePrefix, createAsLinkedConfig);
                 // project is a windows application or console application? if so add click once transform task
-                if (project.IsProjectOutputTypeExecutable())
-                {
-                    ProjectXmlTransform.AddAfterPublishTarget(appConfigName);
-                }
+                // removed this check for deployed class library projects (Word Add-In)
+                //if (project.IsProjectOutputTypeExecutable())
+                //{
+                ProjectXmlTransform.AddAfterPublishTarget();
+                //}
 
                 // save project file
                 var isSaved = ProjectXmlTransform.Save();
                 // check if need to reload project
                 if (isSaved)
                 {
-                    ReloadProject(project);
+                    project.SaveReloadProject();
+                    //ReloadProject(project);
                 }
                 return isSaved;
             }
@@ -127,67 +133,24 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             if (targetProject.IsDirty) targetProject.Save();
         }
 
-        private static void ReloadProject(Project project)
+        // disclaimer: visual studio don't support adding dependent file under linked file
+        // so no dependent transformed config under linked app.config in designer
+        private static void CreateAppConfigFiles(Project project, ProjectItem projectItem)
         {
-            var dte = project.DTE;
-
-            if (!SelectProjectInExplorer(project)) return;
-
-            dte.ExecuteCommand("File.SaveAll", string.Empty);
-            // unload project
-            dte.ExecuteCommand("Project.UnloadProject", string.Empty);
-            // reload project
-            dte.ExecuteCommand("Project.ReloadProject", string.Empty);
-        }
-
-        private static bool SelectProjectInExplorer(Project project)
-        {
-            var dte = project.DTE;
-            // Get the the Solution Explorer tree
-            var solutionExplorer = ((UIHierarchy)dte.Windows.Item(Constants.vsWindowKindSolutionExplorer).Object);
-            var solutionName = solutionExplorer.UIHierarchyItems.Item(1).Name;
-
-            return SelectProject(solutionExplorer, solutionName, project.Name);
-        }
-
-        private static bool SelectProject(UIHierarchy solutionExplorer, string solutionName, string projectName)
-        {
-            var selectedItems = solutionExplorer.SelectedItems as Array;
-            if (selectedItems == null) return false;
-            var selectedItem = selectedItems.GetValue(0) as UIHierarchyItem;
-
-            try
-            {
-                // is it the project we are looking for?
-                if (selectedItem.Name == projectName) return true;
-                // is it the root?
-                if (selectedItem.Name == solutionName) return false;
-            }
-                // suppress exceptions for items w/o names
-                // ReSharper disable EmptyGeneralCatchClause
-            catch
-                // ReSharper restore EmptyGeneralCatchClause
-            {
-            }
-            // move up in hierarchy
-            solutionExplorer.SelectUp(vsUISelectionType.vsUISelectionTypeSelect, 1);
-            return SelectProject(solutionExplorer, solutionName, projectName);
-        }
-
-        public static bool IsRootAppConfig(string fileName)
-        {
-            if (!fileName.EndsWith(".config", StringComparison.OrdinalIgnoreCase)) return false;
-            if (fileName.Split('.').Length > 2) return false;
-            return true;
-        }
-
-        private static void CreateAppConfigFiles(Project project, ProjectItem projectItem, string appConfigName)//, IEnumerable<string> buildConfigurationNames)//, string path)
-        {
+            string appConfigName = projectItem.Name;
             var buildConfigurationNames = project.GetBuildConfigurationNames();
             var projectFileIsDirty = false;
             // get app.config directory. new transform config will be created there.
             //var path = projectItem.GetFullPath();
-            var path = Directory.GetParent(projectItem.GetFullPath()).FullName;
+            string path = null;
+            if (projectItem.IsLink())
+            {
+                path = Directory.GetParent(projectItem.ContainingProject.FullName).FullName;
+            }
+            else
+            {
+                path = Directory.GetParent(projectItem.GetFullPath()).FullName;
+            }
 
             foreach (var buildConfigurationName in buildConfigurationNames)
             {

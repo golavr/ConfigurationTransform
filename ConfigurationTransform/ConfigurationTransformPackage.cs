@@ -89,20 +89,9 @@ namespace GolanAvraham.ConfigurationTransform
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
-                // store app config name
-
                 if (ConfigTransformManager.IsRootAppConfig(_selectedProjectItem.Name))
                 {
-                    // cache selected config project
-                    //_selectedProject = _selectedProjectItem.ContainingProject;
                     menuCommand.Visible = true;
-                    //var isLinkAppConfig = _selectedProjectItem.IsLink();
-
-                    ////TODO:[Golan] - finish
-                    //if (isLinkAppConfig)
-                    //{
-                    //    HandleLinkAppConfig(_selectedProjectItem, _selectedProject);
-                    //}
                 }
                 else
                 {
@@ -114,35 +103,6 @@ namespace GolanAvraham.ConfigurationTransform
                 Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Exception in BeforeQueryStatus() of: {0}. Exception message: {1}", this.ToString(), e.Message));
             }
         }
-
-        //private void HandleLinkAppConfig(ProjectItem targetProjectItem, Project targetProject)
-        //{
-        //    // get target app.config full path
-        //    var targetRootConfigFullPath = targetProjectItem.GetFullPath();
-
-        //    // get source root config
-        //    var sourceRootConfig = VsServices.Instance.GetProjectItemContainingFullPath(targetRootConfigFullPath);
-        //    //var sourceRootConfig =
-        //    //    VsServices.Instance.Dte.GetProjectItemHavingProperties(
-        //    //        p1 => p1.IsLink && p1.FullPath == targetRootConfigFullPath);
-        //    //var sourceRootConfig = VsServices.Instance.Dte.GetProjectItemHavingProperties<IEquatable<FileProperties>>(enumerable => enumerable.);
-        //    // iterate source root config items
-        //    foreach (var item in sourceRootConfig.ProjectItems.AsEnumerable())
-        //    {
-        //        // get source config dependent config file name
-        //        var sourceFullPath = item.GetFullPath();
-        //        string targetFullPath = null;
-        //        // get target root config not contains source dependent config?
-        //        if (targetProjectItem.ProjectItems.AsEnumerable().All(
-        //            projectItem => projectItem.GetFullPath() != sourceFullPath))
-        //        {
-        //            // add dependent config to target root config
-        //            targetProjectItem.ProjectItems.AddFromFile(sourceFullPath);
-        //        }
-        //    }
-        //    // save target project file
-        //    if (targetProject.IsDirty) _selectedProject.Save();
-        //}
 
         /// <summary>
         /// This function is the callback used to execute a command when the a menu item is clicked.
@@ -158,21 +118,6 @@ namespace GolanAvraham.ConfigurationTransform
 
             // Show a Message Box
             VsServices.Instance.ShowMessageBox(displayMessage);
-            //IVsUIShell uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
-            //Guid clsid = Guid.Empty;
-            //int result;
-            //ErrorHandler.ThrowOnFailure(uiShell.ShowMessageBox(
-            //           0,
-            //           ref clsid,
-            //           "Configuration Transform",
-            //           displayMessage,
-            //           string.Empty,
-            //           0,
-            //           OLEMSGBUTTON.OLEMSGBUTTON_OK,
-            //           OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
-            //           OLEMSGICON.OLEMSGICON_INFO,
-            //           0,        // false
-            //           out result));
         }
 
     }

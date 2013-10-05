@@ -108,6 +108,7 @@
     <Compile Include="Services\Extensions\VsServicesExtensions.cs" />
     <Compile Include="Services\IVsServices.cs" />
     <Compile Include="Services\Extensions\ProjectItemExtensions.cs" />
+    <Compile Include="Services\MessageBoxResult.cs" />
     <Compile Include="Transform\ConfigTransformManager.cs" />
     <Compile Include="Services\VsServices.cs" />
     <Compile Include="Transform\VsProjectXmlTransform.cs" />

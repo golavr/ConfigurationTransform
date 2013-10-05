@@ -158,8 +158,8 @@ namespace ConfigurationTransform.Test
             //Assert
             //vsServices.Verify(v=>v.ShowMessageBox(It.IsAny<string>(),It.IsAny<string>(), OLEMSGBUTTON.OLEMSGBUTTON_YESNO, OLEMSGICON.OLEMSGICON_QUERY));
             projectXml.Verify(v => v.AddTransformTask());
-            projectXml.Verify(v => v.AddAfterCompileTarget(RootAppConfig, @"..\my.common\"));
-            projectXml.Verify(v => v.AddAfterPublishTarget(RootAppConfig));
+            projectXml.Verify(v => v.AddAfterCompileTarget(RootAppConfig, @"..\my.common\", true));
+            projectXml.Verify(v => v.AddAfterPublishTarget());//RootAppConfig));
             //Assert.IsTrue(isSaved);
         }
 

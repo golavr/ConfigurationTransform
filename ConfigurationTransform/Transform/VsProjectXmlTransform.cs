@@ -14,8 +14,8 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         void AddDependentUponConfig(string buildConfigurationName, string appConfigName);
         void AddDependentUponConfig(string[] buildConfigurationNames, string appConfigName);
         void AddTransformTask();
-        void AddAfterCompileTarget(string appConfigName, string relativePrefix = null);
-        void AddAfterPublishTarget(string appConfigName);
+        void AddAfterCompileTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false);
+        void AddAfterPublishTarget();
     }
 
     public class VsProjectXmlTransform : IVsProjectXmlTransform
@@ -146,13 +146,19 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             _projectRoot.Add(usingTaskNode);
         }
 
-        public void AddAfterCompileTarget(string appConfigName, string relativePrefix = null)
+        public void AddAfterCompileTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false)
         {
             var appConfigSplit = appConfigName.Split('.');
             var configName = appConfigSplit[0];
             var configExt = appConfigSplit[1];
             // App.$(Configuration).config
             var configFormat = string.Format("{0}{1}.$(Configuration).{2}", relativePrefix, configName, configExt);
+            var transformConfig = configFormat;
+            if (!transformConfigIsLink)
+            {
+                transformConfig = string.Format("{0}.$(Configuration).{1}", configName, configExt);
+            }
+
             var condition = string.Format("Exists('{0}')", configFormat);
 
             var appConfigWithPrefix = string.Format("{0}{1}", relativePrefix, appConfigName);
@@ -169,7 +175,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                                          new XComment(generateComment),
                                          CreateElement("TransformXml", new XAttribute("Source", appConfigWithPrefix),
                                                       new XAttribute("Destination", destination),
-                                                      new XAttribute("Transform", configFormat)),
+                                                      new XAttribute("Transform", transformConfig)),
                                          new XComment(forceComment),
                                          CreateElement("ItemGroup",
                                                       CreateElement("AppConfigWithTargetPath",
@@ -181,7 +187,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             _projectRoot.Add(targetNod);
         }
 
-        public void AddAfterPublishTarget(string appConfigName)
+        public void AddAfterPublishTarget()
         {
             // check if already exists
             if (HasAfterPublishTarget()) return;
