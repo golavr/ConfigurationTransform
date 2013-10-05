@@ -54,7 +54,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 if (isLinkAppConfig)
                 {
                     // display yes/no message to user. yes - add as lined configs; no - add as concrete configs
-                    var result = VsService.ShowMessageBox("Add as linked conifg?",
+                    var result = VsService.ShowMessageBox("Add as linked conifgs?",
                                                           OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
                                                           OLEMSGICON.OLEMSGICON_QUERY);
 
