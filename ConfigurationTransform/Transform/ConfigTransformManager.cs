@@ -192,5 +192,12 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
             return true;
         }
+
+        public static bool IsRootAppConfig(string fileName)
+        {
+            if (!fileName.EndsWith(".config", StringComparison.OrdinalIgnoreCase)) return false;
+            if (fileName.Split('.').Length > 2) return false;
+            return true;
+        }
     }
 }
