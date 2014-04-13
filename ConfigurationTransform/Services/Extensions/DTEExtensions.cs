@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 
 namespace GolanAvraham.ConfigurationTransform.Services.Extensions
@@ -49,10 +50,20 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
                     dte.Solution.Projects.AsEnumerable().SelectMany(project => project.ProjectItems.AsEnumerable()))
             {
                 if (projectItem.IsHavingProperties(predicate)) return projectItem;
+                if (projectItem.ProjectItems == null)
+                {
+                    if (projectItem.SubProject == null || projectItem.SubProject.ProjectItems == null) continue;
+                    var subProjectItemHavingProperties =
+                        projectItem.SubProject.ProjectItems.GetProjectItemHavingProperties(predicate);
+                    if (subProjectItemHavingProperties != null) return subProjectItemHavingProperties;
+                    continue;
+                }
                 var projectItemHavingProperties = projectItem.ProjectItems.GetProjectItemHavingProperties(predicate);
                 if (projectItemHavingProperties != null) return projectItemHavingProperties;
             }
             return null;
         }
     }
+
+
 }

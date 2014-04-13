@@ -69,6 +69,13 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
                 var isProjectItemPropertiesIncluded = projectItem.IsHavingProperties(predicate);//predicate.Invoke(projectItem.Properties.AsEnumerable());
                 if (isProjectItemPropertiesIncluded) return projectItem;
 
+                if (projectItem.ProjectItems == null)
+                {
+                    if (projectItem.SubProject == null || projectItem.SubProject.ProjectItems == null) continue;
+                    var subProjectItemHavingProperties = projectItem.SubProject.ProjectItems.GetProjectItemHavingProperties(predicate);
+                    if (subProjectItemHavingProperties != null) return subProjectItemHavingProperties;
+                    continue;
+                }
                 // check if branch
                 if (projectItem.ProjectItems.AsEnumerable().Any())
                 {

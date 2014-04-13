@@ -60,6 +60,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             {
                 throw new ArgumentNullException("predicate");
             }
+            if (source.Properties == null) return false;
             var isHavingProperties = predicate(source.Properties);
             return isHavingProperties;
         }
