@@ -152,7 +152,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             var configName = appConfigSplit[0];
             var configExt = appConfigSplit[1];
             // App.$(Configuration).config
-            var configFormat = string.Format("{0}{1}.$(Configuration).{2}", relativePrefix, configName, configExt);
+            var configFormat = string.Format(@"{0}\{1}.$(Configuration).{2}", relativePrefix, configName, configExt);
             var transformConfig = configFormat;
             if (!transformConfigIsLink)
             {
@@ -161,7 +161,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
             var condition = string.Format("Exists('{0}')", configFormat);
 
-            var appConfigWithPrefix = string.Format("{0}{1}", relativePrefix, appConfigName);
+            var appConfigWithPrefix = string.Format(@"{0}\{1}", relativePrefix, appConfigName);
             // check if already exists
             if (HasAfterCompileTarget(condition)) return;
             _isDirty = true;

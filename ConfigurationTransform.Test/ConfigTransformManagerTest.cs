@@ -132,6 +132,24 @@ namespace ConfigurationTransform.Test
         }
 
         [TestMethod]
+        public void CreateLinkedAppConfigFilesNotFromProject_Call_AddFromFile_On_TargetProjectLinkedFile_Save_TargetProject()
+        {
+            //Arrange
+            Mock<ProjectItems> projectItemsTargetChilds;
+            Mock<Project> projectTarget;
+            var projectItemTarget = CreateSolution(out projectItemsTargetChilds, out projectTarget, false);
+
+            //Act
+            ConfigTransformManager.CreateLinkedAppConfigFiles(projectItemTarget.Object);
+
+            //Assert
+            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.debug.config"));
+            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.release.config"));
+
+            projectTarget.Verify(v => v.Save(""));
+        }
+
+        [TestMethod]
         public void EditProjectFile_Call_ShowMessageBox_XmlAddTargets()
         {
             //Arrange
@@ -158,7 +176,7 @@ namespace ConfigurationTransform.Test
             //Assert
             //vsServices.Verify(v=>v.ShowMessageBox(It.IsAny<string>(),It.IsAny<string>(), OLEMSGBUTTON.OLEMSGBUTTON_YESNO, OLEMSGICON.OLEMSGICON_QUERY));
             projectXml.Verify(v => v.AddTransformTask());
-            projectXml.Verify(v => v.AddAfterCompileTarget(RootAppConfig, @"..\my.common\", true));
+            projectXml.Verify(v => v.AddAfterCompileTarget(RootAppConfig, @"..\my.common", true));
             projectXml.Verify(v => v.AddAfterPublishTarget());//RootAppConfig));
             //Assert.IsTrue(isSaved);
         }
@@ -178,13 +196,17 @@ namespace ConfigurationTransform.Test
             Assert.AreEqual(relativePath, @"..\my.common\app.config");
         }
 
-        private static Mock<ProjectItem> CreateSolution(out Mock<ProjectItems> projectItemsTargetChilds, out Mock<Project> projectTarget)
+        private static Mock<ProjectItem> CreateSolution(out Mock<ProjectItems> projectItemsTargetChilds, out Mock<Project> projectTarget, bool createWithConcreteConfigs = true)
         {
             var dte = new Mock<DTE>();
             var solution = new Mock<Solution>();
 
             // source
-            var projectSource = CreateProjectWithConcreteConfigs(dte, @"c:\myproject\my.common\app.debug.config", @"c:\myproject\my.common\app.release.config");
+            var projectSource = createWithConcreteConfigs
+                                              ? CreateProjectWithConcreteConfigs(dte,
+                                                                                 @"c:\myproject\my.common\app.debug.config",
+                                                                                 @"c:\myproject\my.common\app.release.config")
+                                              : null;
 
             // target
             Mock<ProjectItem> projectItemTarget;
@@ -192,7 +214,7 @@ namespace ConfigurationTransform.Test
 
 
             //projects - source + target
-            var projects = CreateEnumerableMock<Projects, Project>(projectSource.Object, projectTarget.Object);
+            var projects = CreateEnumerableMock<Projects, Project>(projectSource !=null ? projectSource.Object: null, projectTarget.Object);
 
             solution.SetupGet(s => s.Projects).Returns(projects.Object);
             dte.SetupGet(s => s.Solution).Returns(solution.Object);
@@ -295,6 +317,9 @@ namespace ConfigurationTransform.Test
             projectTarget.SetupGet(s => s.Properties).Returns(projProperties.Object);
             projectTarget.SetupGet(s => s.ProjectItems).Returns(projectItemsTarget.Object);
             projectTarget.SetupGet(s => s.FullName).Returns(@"c:\myproject\my.console\my.console.csproj");
+            var configurationManager = new Mock<ConfigurationManager>();
+            configurationManager.SetupGet(s => s.ConfigurationRowNames).Returns(new[] { "Debug", "Release" });
+            projectTarget.SetupGet(s => s.ConfigurationManager).Returns(configurationManager.Object);
             return projectTarget;
         }
 
@@ -304,7 +329,7 @@ namespace ConfigurationTransform.Test
         {
             var enumerableMock = new Mock<TEnumerable>();
             var enumerableInterface = enumerableMock.As<IEnumerable>();
-            enumerableInterface.Setup(s => s.GetEnumerator()).Returns(() => items.GetEnumerator());
+            enumerableInterface.Setup(s => s.GetEnumerator()).Returns(() => items.Where(w=>w != null).GetEnumerator());
 
             return enumerableMock;
         }

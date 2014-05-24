@@ -108,10 +108,13 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             return firstTrim;
         }
 
-        public static string RelativePath(this string firstPath, string secondPath)
+        public static string RelativePath(this string filePath, string referencePath)
         {
-            var trimStart = firstPath.TrimStart(secondPath, @"\");
-            var relativePath = string.Format("{0}{1}", "..", trimStart);
+            var fileUri = new Uri(filePath);
+            var referenceUri = new Uri(referencePath);
+            var relativePath = referenceUri.MakeRelativeUri(fileUri).ToString();
+
+            relativePath = relativePath.Replace(@"/", @"\");
 
             return relativePath;
         }
@@ -119,7 +122,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
         public static string RelativeDirectory(this string source)
         {
             var lastIndex = source.LastIndexOf(@"\");
-            var relativeDirectory = source.Substring(0, lastIndex + 1);
+            var relativeDirectory = source.Substring(0, lastIndex);
 
             return relativeDirectory;
         }

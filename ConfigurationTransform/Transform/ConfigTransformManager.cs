@@ -54,7 +54,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 if (isLinkAppConfig)
                 {
                     // display yes/no message to user. yes - add as lined configs; no - add as concrete configs
-                    var result = VsService.ShowMessageBox("Add as linked conifgs?",
+                    var result = VsService.ShowMessageBox("Add as linked configs?",
                                                           OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
                                                           OLEMSGICON.OLEMSGICON_QUERY);
 
@@ -113,7 +113,26 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             // get source root config project item
             var sourceRootConfig = targetProjectItem.GetProjectItemContainingFullPath();
 
-            if (sourceRootConfig.ProjectItems == null) return;
+            // sorce config is not included in project
+            if (sourceRootConfig == null)
+            {
+                CreateLikedAppConfigFilesNotFromProject(targetProjectItem);
+            }
+            else
+            {
+                if (sourceRootConfig.ProjectItems == null) return;
+
+                CreateLikedAppConfigFilesFromProject(targetProjectItem, sourceRootConfig);
+            }
+
+            // get item containing project
+            var targetProject = targetProjectItem.ContainingProject;
+            // save target project file
+            if (targetProject.IsDirty) targetProject.Save();
+        }
+
+        private static void CreateLikedAppConfigFilesFromProject(ProjectItem targetProjectItem, ProjectItem sourceRootConfig)
+        {
             // iterate source root config items
             foreach (var item in sourceRootConfig.ProjectItems.AsEnumerable())
             {
@@ -127,11 +146,30 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                     targetProjectItem.ProjectItems.AddFromFile(sourceFullPath);
                 }
             }
-            // get item containing project
-            var targetProject = targetProjectItem.ContainingProject;
-            // save target project file
-            if (targetProject.IsDirty) targetProject.Save();
         }
+
+        private static void CreateLikedAppConfigFilesNotFromProject(ProjectItem targetProjectItem)
+        {
+            var appConfigName = targetProjectItem.Name;
+            var sourceAppConfigPath = targetProjectItem.GetFullPath();
+            var project = targetProjectItem.ContainingProject;
+            var buildConfigurationNames = project.GetBuildConfigurationNames();
+            
+            var sourceConfigDirectory = Directory.GetParent(sourceAppConfigPath).FullName;
+
+            foreach (var buildConfigurationName in buildConfigurationNames)
+            {
+                var dependentConfig = GetTransformConfigName(appConfigName, buildConfigurationName);
+                var sourceDependentConfigFullPath = Path.Combine(sourceConfigDirectory, dependentConfig);
+                // check if source config file exist and not exist in target
+                if (File.Exists(sourceDependentConfigFullPath) &&
+                    targetProjectItem.ProjectItems.AsEnumerable().All(c => c.Name != dependentConfig))
+                {
+                    targetProjectItem.ProjectItems.AddFromFile(sourceDependentConfigFullPath);
+                }
+            }
+        }
+
 
         // disclaimer: visual studio don't support adding dependent file under linked file
         // so no dependent transformed config under linked app.config in designer

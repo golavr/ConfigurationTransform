@@ -10,9 +10,62 @@ namespace ConfigurationTransform.Test
     public class ProjectItemExtensionsTest
     {
         [TestMethod]
-        public void TestMethod1()
+        public void RelativePath_HigherLevel()
         {
-            var target = new Mock<ProjectItem>() {CallBase = true};
+            //Arrange
+            const string filePath = @"c:\folder1\folder2\folder3\firstproject\file.txt";
+            const string referencePath = @"c:\folder1\folder2\folder3\folder4\secondproject\file.txt";
+            var expected = @"..\..\firstproject\file.txt";
+
+            //Act
+            var actual = ProjectItemExtensions.RelativePath(filePath, referencePath);
+
+            //Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void RelativePath_LowerLevel()
+        {
+            //Arrange
+            const string filePath = @"c:\folder1\folder2\folder3\folder4\firstproject\file.txt";
+            const string referencePath = @"c:\folder1\folder2\folder3\secondproject\file.txt";
+            var expected = @"..\folder4\firstproject\file.txt";
+
+            //Act
+            var actual = ProjectItemExtensions.RelativePath(filePath, referencePath);
+
+            //Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void RelativePath_SameLevel()
+        {
+            //Arrange
+            const string filePath = @"c:\folder1\folder2\folder3\firstproject\file.txt";
+            const string referencePath = @"c:\folder1\folder2\folder3\secondproject\file.txt";
+            var expected = @"..\firstproject\file.txt";
+
+            //Act
+            var actual = ProjectItemExtensions.RelativePath(filePath, referencePath);
+
+            //Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void RelativeDirectory()
+        {
+            //Arrange
+            var relativePath = @"..\folder4\firstproject\file.txt";
+            var expected = @"..\folder4\firstproject";
+
+            //Act
+            var actual = ProjectItemExtensions.RelativeDirectory(relativePath);
+
+            //Assert
+            Assert.AreEqual(expected, actual);
         }
     }
 }
