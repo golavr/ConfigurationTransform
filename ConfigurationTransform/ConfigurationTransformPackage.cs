@@ -68,12 +68,50 @@ namespace GolanAvraham.ConfigurationTransform
             var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
             {
+                // Transform
                 var menuCommandId = new CommandID(GuidList.guidConfigurationTransformCmdSet, (int)PkgCmdIDList.cmdidAddConfigTransforms);
                 var oleMenuCommand = new OleMenuCommand(MenuItemCallback, null, BeforeQueryStatus, menuCommandId);
                 mcs.AddCommand(oleMenuCommand);
+
+                // Preview
+                var previewCommandId = new CommandID(GuidList.guidConfigurationTransformCmdSet, (int)PkgCmdIDList.cmdidPreviewConfigTransforms);
+                var previewOleMenuCommand = new OleMenuCommand(PreviewMenuItemCallback, null, PreviewBeforeQueryStatus, previewCommandId);
+                mcs.AddCommand(previewOleMenuCommand);
             }
         }
+
         #endregion
+
+        private void PreviewBeforeQueryStatus(object sender, EventArgs eventArgs)
+        {
+            try
+            {
+                var menuCommand = sender as OleMenuCommand;
+                if (menuCommand == null) return;
+
+                var dte2 = DTEExtensions.GetInstance();
+                var selectedItem = dte2.GetSelectedItem();
+                // cache selected config project
+                _selectedProjectItem = selectedItem.ProjectItem;
+                if (ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name))
+                {
+                    menuCommand.Visible = true;
+                }
+                else
+                {
+                    menuCommand.Visible = false;
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Exception in PreviewBeforeQueryStatus() of: {0}. Exception message: {1}", this.ToString(), e.Message));
+            }
+        }
+
+        private void PreviewMenuItemCallback(object sender, EventArgs e)
+        {
+
+        }
 
         private ProjectItem _selectedProjectItem;
 

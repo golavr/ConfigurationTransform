@@ -64,9 +64,10 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
 
+      <!-- Transform -->
       <Button guid="guidConfigurationTransformCmdSet" id="cmdidAddConfigTransforms" priority="0x0100" type="Button">
         <Parent guid="guidConfigurationTransformCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+        <Icon guid="guidImages" id="transformPic" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidAddConfigTransforms</CommandName>
@@ -74,6 +75,16 @@
         </Strings>
       </Button>
 
+      <!-- Preview -->
+      <Button guid="guidConfigurationTransformCmdSet" id="cmdidPreviewConfigTransforms" priority="0x0101" type="Button">
+        <Parent guid="guidConfigurationTransformCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages" id="transformPic" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>cmdidAddConfigTransforms</CommandName>
+          <ButtonText>Preview Config Transforms</ButtonText>
+        </Strings>
+      </Button>
 
 
     </Buttons>
@@ -85,8 +96,8 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <!--<Bitmap guid="guidImages" href="Resources\Images_32bit.bmp" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>-->
-      <Bitmap guid="guidImages" href="Resources\Images.bmp" usedList="bmpPic1, bmpPic2" />
+      <!--<Bitmap guid="guidImages" href="Resources\Images_32bit.bmp" usedList="transformPic, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>-->
+      <Bitmap guid="guidImages" href="Resources\Images.bmp" usedList="transformPic, bmpPic2" />
 
     </Bitmaps>
  
@@ -105,12 +116,13 @@
 
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidAddConfigTransforms" value="0x0100" />
+      <IDSymbol name="cmdidPreviewConfigTransforms" value="0x0101" />
     </GuidSymbol>
     
     
     
     <GuidSymbol name="guidImages" value="{43441cc5-1ce8-47fd-b765-e499fb627619}">
-      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="transformPic" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <!--<IDSymbol name="bmpPicSearch" value="3" />
       <IDSymbol name="bmpPicX" value="4" />
