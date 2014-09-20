@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using EnvDTE;
@@ -80,6 +81,11 @@ namespace GolanAvraham.ConfigurationTransform
             }
         }
 
+        public override string ToString()
+        {
+            return "ConfigurationTransformPackage";
+        }
+
         #endregion
 
         private void PreviewBeforeQueryStatus(object sender, EventArgs eventArgs)
@@ -104,13 +110,23 @@ namespace GolanAvraham.ConfigurationTransform
             }
             catch (Exception e)
             {
-                Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Exception in PreviewBeforeQueryStatus() of: {0}. Exception message: {1}", this.ToString(), e.Message));
+                Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
+                    "Exception in PreviewBeforeQueryStatus() of: {0}. Exception message: {1}", this,
+                    e.Message));
             }
         }
 
-        private void PreviewMenuItemCallback(object sender, EventArgs e)
+        private void PreviewMenuItemCallback(object sender, EventArgs eventArgs)
         {
-
+            try
+            {
+                ConfigTransformManager.PreviewTransform(_selectedProjectItem);
+  }
+            catch (Exception e)
+            {
+                Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
+                    "Exception in PreviewMenuItemCallback() of: {0}. Exception message: {1}", this, e.Message));
+            }
         }
 
         private ProjectItem _selectedProjectItem;
@@ -138,7 +154,8 @@ namespace GolanAvraham.ConfigurationTransform
             }
             catch (Exception e)
             {
-                Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Exception in BeforeQueryStatus() of: {0}. Exception message: {1}", this.ToString(), e.Message));
+                Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
+                    "Exception in BeforeQueryStatus() of: {0}. Exception message: {1}", this, e.Message));
             }
         }
 

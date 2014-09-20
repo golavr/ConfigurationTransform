@@ -37,6 +37,23 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             return propertyValue;
         }
 
+        public static ProjectItem ParentProjectItemOrDefault(this ProjectItem source)
+        {
+            var containingProject = source.ContainingProject;
+            if (containingProject == null) return null;
+
+            foreach (var projectItem in containingProject.ProjectItems.AsEnumerable())
+            {
+                var found = projectItem.ContainingProjectItem(item => item.Name == source.Name).FirstOrDefault();
+                // found self(source is root)?
+                if (projectItem == found) return null;
+                // found sub project item?
+                if (found != null) return projectItem;
+            }
+
+            return null;
+        }
+
         public static bool IsLink(this ProjectItem source)
         {
             // is link file?
@@ -63,6 +80,27 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             if (source.Properties == null) return false;
             var isHavingProperties = predicate(source.Properties);
             return isHavingProperties;
+        }
+
+        public static IEnumerable<ProjectItem> ContainingProjectItem(this ProjectItem source, Predicate<ProjectItem> predicate)
+        {
+            if (predicate == null)
+            {
+                throw new ArgumentNullException("predicate");
+            }
+            if (predicate(source))
+            {
+                yield return source;
+                yield break;
+            }
+            if (source.ProjectItems.Count < 1) yield break;
+            foreach (var projectItem in source.ProjectItems.AsEnumerable())
+            {
+                if (projectItem.ContainingProjectItem(predicate).Any())
+                {
+                    yield return projectItem;
+                }
+            }
         }
 
         public static ProjectItem GetProjectItemContainingFullPath(this ProjectItem source, bool isLink = false)

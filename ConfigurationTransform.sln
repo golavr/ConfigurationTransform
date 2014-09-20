@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3718D225-EC78-45A4-BEEC-07DB37A411C2}"
 	ProjectSection(SolutionItems) = preProject
 		ConfigurationTransform.vsmdi = ConfigurationTransform.vsmdi
@@ -12,10 +14,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationTransform", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationTransform.Test", "ConfigurationTransform.Test\ConfigurationTransform.Test.csproj", "{FD8CFB45-F75B-40DC-899A-F07233BA64E7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionResources", "SolutionResources", "{48E4E05B-7604-477A-A450-6DDE8210C3CF}"
+	ProjectSection(SolutionItems) = preProject
+		SolutionResources\Microsoft.Web.XmlTransform.dll = SolutionResources\Microsoft.Web.XmlTransform.dll
+	EndProjectSection
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = ConfigurationTransform.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -32,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = ConfigurationTransform.vsmdi
 	EndGlobalSection
 EndGlobal

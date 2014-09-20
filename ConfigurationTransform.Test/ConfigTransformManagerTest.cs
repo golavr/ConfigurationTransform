@@ -6,6 +6,7 @@ using EnvDTE;
 using GolanAvraham.ConfigurationTransform.Services;
 using GolanAvraham.ConfigurationTransform.Services.Extensions;
 using GolanAvraham.ConfigurationTransform.Transform;
+using GolanAvraham.ConfigurationTransform.Wrappers;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -26,6 +27,8 @@ namespace ConfigurationTransform.Test
 
         const string FullPath = "FullPath";
         const string IsLink = "IsLink";
+
+        private static readonly string[] ConfigNames = new string[] {"Debug", "Release"};
 
         [TestMethod]
         public void GetTransformConfigName_Success()
@@ -120,6 +123,9 @@ namespace ConfigurationTransform.Test
             Mock<ProjectItems> projectItemsTargetChilds;
             Mock<Project> projectTarget;
             var projectItemTarget = CreateSolution(out projectItemsTargetChilds, out projectTarget);
+            var fileWrapperMock = new Mock<IFileWrapper>();
+            fileWrapperMock.Setup(wrapper => wrapper.Exists(It.IsAny<string>())).Returns(true);
+            ConfigTransformManager.FileWrapper = fileWrapperMock.Object;
 
             //Act
             ConfigTransformManager.CreateLinkedAppConfigFiles(projectItemTarget.Object);
@@ -138,13 +144,16 @@ namespace ConfigurationTransform.Test
             Mock<ProjectItems> projectItemsTargetChilds;
             Mock<Project> projectTarget;
             var projectItemTarget = CreateSolution(out projectItemsTargetChilds, out projectTarget, false);
+            var fileWrapperMock = new Mock<IFileWrapper>();
+            fileWrapperMock.Setup(wrapper => wrapper.Exists(It.IsAny<string>())).Returns(true);
+            ConfigTransformManager.FileWrapper = fileWrapperMock.Object;
 
             //Act
             ConfigTransformManager.CreateLinkedAppConfigFiles(projectItemTarget.Object);
 
             //Assert
-            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.debug.config"));
-            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.release.config"));
+            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.Debug.config"));
+            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.Release.config"));
 
             projectTarget.Verify(v => v.Save(""));
         }
@@ -318,7 +327,7 @@ namespace ConfigurationTransform.Test
             projectTarget.SetupGet(s => s.ProjectItems).Returns(projectItemsTarget.Object);
             projectTarget.SetupGet(s => s.FullName).Returns(@"c:\myproject\my.console\my.console.csproj");
             var configurationManager = new Mock<ConfigurationManager>();
-            configurationManager.SetupGet(s => s.ConfigurationRowNames).Returns(new[] { "Debug", "Release" });
+            configurationManager.SetupGet(s => s.ConfigurationRowNames).Returns(ConfigNames);
             projectTarget.SetupGet(s => s.ConfigurationManager).Returns(configurationManager.Object);
             return projectTarget;
         }

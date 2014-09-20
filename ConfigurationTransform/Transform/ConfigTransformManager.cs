@@ -4,11 +4,15 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Xml;
 using EnvDTE;
 using GolanAvraham.ConfigurationTransform.Services;
 using GolanAvraham.ConfigurationTransform.Services.Extensions;
+using GolanAvraham.ConfigurationTransform.Wrappers;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.Web.XmlTransform;
 using Constants = EnvDTE.Constants;
 
 namespace GolanAvraham.ConfigurationTransform.Transform
@@ -28,11 +32,16 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
         public static IVsProjectXmlTransform ProjectXmlTransform { get; set; }
 
+        public static IFileWrapper FileWrapper { get; set; }
+        public static IStreamManager StreamManager { get; set; }
+
         static ConfigTransformManager()
         {
             // add default vs service
             VsService = VsServices.Instance;
             ProjectXmlTransform = new VsProjectXmlTransform();
+            FileWrapper = new FileWrapper();
+            StreamManager = new StreamManager();
         }
 
         public static bool EditProjectFile(ProjectItem projectItem)
@@ -162,7 +171,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 var dependentConfig = GetTransformConfigName(appConfigName, buildConfigurationName);
                 var sourceDependentConfigFullPath = Path.Combine(sourceConfigDirectory, dependentConfig);
                 // check if source config file exist and not exist in target
-                if (File.Exists(sourceDependentConfigFullPath) &&
+                if (FileWrapper.Exists(sourceDependentConfigFullPath) &&
                     targetProjectItem.ProjectItems.AsEnumerable().All(c => c.Name != dependentConfig))
                 {
                     targetProjectItem.ProjectItems.AddFromFile(sourceDependentConfigFullPath);
@@ -195,9 +204,9 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 var dependentConfig = GetTransformConfigName(appConfigName, buildConfigurationName);
                 var dependentConfigFullPath = Path.Combine(path, dependentConfig);
                 // check if config file exist
-                if (!File.Exists(dependentConfigFullPath))
+                if (!FileWrapper.Exists(dependentConfigFullPath))
                 {
-                    using (var file = File.AppendText(dependentConfigFullPath))
+                    using (var file = FileWrapper.AppendText(dependentConfigFullPath))
                     {
                         file.Write(DependencyConfigContent);
                     }
@@ -236,6 +245,82 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             if (!fileName.EndsWith(".config", StringComparison.OrdinalIgnoreCase)) return false;
             if (fileName.Split('.').Length > 2) return false;
             return true;
+        }
+
+        /// <summary>
+        /// Return transformed xml string 
+        /// </summary>
+        /// <param name="sourcePath">app.config</param>
+        /// <param name="targetPath">app.debug.config</param>
+        /// <returns>Transformed xml string</returns>
+        public static string GetTransformString(string sourcePath, string targetPath)
+        {
+            var xmlDocument = OpenSourceFile(sourcePath);
+
+            var xmlTransformation = new XmlTransformation(targetPath);
+            xmlTransformation.Apply(xmlDocument);
+
+            var xmlString = xmlDocument.OuterXml;
+            return xmlString;
+        }
+
+        private static XmlTransformableDocument OpenSourceFile(string sourceFile)
+        {
+            try
+            {
+                XmlTransformableDocument transformableDocument = new XmlTransformableDocument();
+                transformableDocument.PreserveWhitespace = true;
+                transformableDocument.Load(sourceFile);
+                return transformableDocument;
+            }
+            catch (XmlException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception();
+            }
+        }
+
+        public static void PreviewTransform(ProjectItem projectItem)
+        {
+            var parent = projectItem.ParentProjectItemOrDefault();
+            if (parent == null)
+            {
+                VsServices.Instance.ShowMessageBox("Cannot find source config");
+                return;
+            }
+            var targetFileName = projectItem.Name;
+            var sourceLabel = parent.Name;
+            var sourcePath = parent.GetFullPath();
+            var targetLabel = targetFileName;
+            var targetPath = @"";
+
+            // apply transform on file
+            var xmlString = GetTransformString(sourcePath, projectItem.GetFullPath());
+            // create temp file
+            var tempFilePath = GetTempFilePath(targetFileName);
+
+            targetPath = tempFilePath;
+            // write to temp file
+            WriteToFile(tempFilePath, xmlString);
+        }
+
+        private static void WriteToFile(string tempFilePath, string stringToWrite)
+        {
+            using (var file = StreamManager.NewStreamWriter(tempFilePath, false))
+            {
+                file.Write(stringToWrite);
+            }
+        }
+
+        private static string GetTempFilePath(string fileNamePrefix)
+        {
+            var tempPath = Path.GetTempPath();
+            var tempFileName = string.Format("{0}.{1}", fileNamePrefix, Guid.NewGuid().ToString());
+            var tempFilePath = Path.Combine(tempPath, tempFileName);
+            return tempFilePath;
         }
     }
 }
