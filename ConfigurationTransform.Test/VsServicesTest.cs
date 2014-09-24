@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Security.AccessControl;
 using EnvDTE;
 using GolanAvraham.ConfigurationTransform.Services;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using GolanAvraham.ConfigurationTransform.Services.Extensions;
@@ -13,28 +14,6 @@ namespace ConfigurationTransform.Test
     [TestClass]
     public class VsServicesTest
     {
-        //[TestMethod]
-        //public void GetSelectedFileName_Returns_AppConfigFileName()
-        //{
-        //    //Arrange
-        //    var target = new Mock<VsServices>();
-        //    var dte = new Mock<DTE>();
-        //    var selectedItems = new Mock<SelectedItems>();
-        //    var selectedItem = new Mock<SelectedItem>();
-        //    const string expected = "app.config";
-        //    selectedItem.SetupGet(s => s.Name).Returns(expected);
-        //    selectedItems.Setup(s => s.Item(It.IsAny<object>())).Returns(selectedItem.Object);
-        //    selectedItems.SetupGet(s => s.Count).Returns(1);
-        //    dte.Setup(s => s.SelectedItems).Returns(selectedItems.Object);
-        //    target.SetupGet(s => s.Dte).Returns(dte.Object);
-
-        //    //Act
-        //    var actual = target.Object.GetSelectedFileName();
-
-        //    //Assert
-        //    Assert.AreEqual(expected, actual);
-        //}
-
         [TestMethod]
         public void IsLinkProjectItem_PropertyExist_Returns_True()
         {
@@ -98,24 +77,6 @@ namespace ConfigurationTransform.Test
             Assert.IsFalse(actual);
         }
 
-        //[TestMethod]
-        //public void GetSelectedFileName_MultiFilesSelected_Returns_Null()
-        //{
-        //    //Arrange
-        //    var target = new Mock<VsServices>();
-        //    var dte = new Mock<DTE>();
-        //    var selectedItems = new Mock<SelectedItems>();
-        //    selectedItems.SetupGet(s => s.Count).Returns(2);
-        //    dte.Setup(s => s.SelectedItems).Returns(selectedItems.Object);
-        //    target.SetupGet(s => s.Dte).Returns(dte.Object);
-
-        //    //Act
-        //    var actual = target.Object.GetSelectedFileName();
-
-        //    //Assert
-        //    Assert.IsNull(actual);
-        //}
-
         [TestMethod]
         public void GetBuildConfigurationNames_Returns_BuildArray()
         {
@@ -133,6 +94,55 @@ namespace ConfigurationTransform.Test
             Assert.AreEqual(2,actual.Length);
             Assert.AreEqual("debug", actual[0]);
             Assert.AreEqual("release", actual[1]);
+        }
+
+        [TestMethod]
+        public void TryRegisterCloseAndDeleteFile_Return_True()
+        {
+            //Arrange
+            const string file = @"c:\file.xml";
+            var windowFrameMock = new Mock<IVsWindowFrame>();
+            var windowFrame2Mock = windowFrameMock.As<IVsWindowFrame2>();
+
+            var deleteHandlerMock = new Mock<IDeleteFileOnWindowFrameClose>();
+
+            //Act
+            var result = windowFrameMock.Object.TryRegisterCloseAndDeleteFile(file, deleteHandlerMock.Object);
+            uint cookie;
+            //Assert
+            Assert.IsTrue(result);
+            windowFrame2Mock.Verify(v => v.Advise(deleteHandlerMock.Object, out cookie));
+        }
+
+        [TestMethod]
+        public void TryRegisterCloseAndDeleteFile_NotCastableTo_IVsWindowFrame2_Return_False()
+        {
+            //Arrange
+            const string file = @"c:\file.xml";
+
+            //Act
+            var result = VsServicesExtensions.TryRegisterCloseAndDeleteFile(null, file);
+
+            //Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void OpenDiff_OpenComparisonWindow_Throw_Exception()
+        {
+            //Arrange
+            const string leftFile = "leftfile";
+            const string rightFile = "rightfile";
+            const string leftLabel = "leftlabel";
+            const string rightLabel = "rightlabel";
+            var mock = new Mock<VsServices>() {CallBase = true};
+            mock.Setup(s => s.OpenComparisonWindow(leftFile, rightFile, leftLabel, rightLabel)).Throws<Exception>();
+
+            //Act
+            mock.Object.OpenDiff(leftFile, rightFile, leftLabel, rightLabel);
+
+            //Assert
+            mock.VerifyAll();
         }
     }
 }

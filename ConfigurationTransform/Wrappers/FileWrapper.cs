@@ -14,5 +14,10 @@ namespace GolanAvraham.ConfigurationTransform.Wrappers
         {
             return File.Exists(path);
         }
+
+        public void Delete(string path)
+        {
+            File.Delete(path);
+        }
     }
 }

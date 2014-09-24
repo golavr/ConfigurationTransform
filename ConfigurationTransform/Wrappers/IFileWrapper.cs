@@ -6,5 +6,6 @@ namespace GolanAvraham.ConfigurationTransform.Wrappers
     {
         StreamWriter AppendText(string path);
         bool Exists(string path);
+        void Delete(string path);
     }
 }

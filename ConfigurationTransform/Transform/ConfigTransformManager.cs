@@ -295,16 +295,17 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             var sourceLabel = parent.Name;
             var sourcePath = parent.GetFullPath();
             var targetLabel = targetFileName;
-            var targetPath = @"";
 
             // apply transform on file
             var xmlString = GetTransformString(sourcePath, projectItem.GetFullPath());
             // create temp file
             var tempFilePath = GetTempFilePath(targetFileName);
 
-            targetPath = tempFilePath;
+            var targetPath = tempFilePath;
             // write to temp file
             WriteToFile(tempFilePath, xmlString);
+
+            VsService.OpenDiff(sourcePath, targetPath, sourceLabel, targetLabel);
         }
 
         private static void WriteToFile(string tempFilePath, string stringToWrite)
