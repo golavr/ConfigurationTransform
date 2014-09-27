@@ -141,6 +141,7 @@
     <Compile Include="Services\Extensions\PropertyExtensions.cs" />
     <Compile Include="Services\Extensions\SelectedItemsExtensions.cs" />
     <Compile Include="Services\Extensions\VsServicesExtensions.cs" />
+    <Compile Include="Services\Helpers\PathHelper.cs" />
     <Compile Include="Services\IDeleteFileOnClose.cs" />
     <Compile Include="Services\IDeleteFileOnWindowFrameClose.cs" />
     <Compile Include="Services\IVsServices.cs" />

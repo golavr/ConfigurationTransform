@@ -6,10 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Windows.Forms.Design;
 using System.Xml;
 using EnvDTE;
 using GolanAvraham.ConfigurationTransform.Services;
 using GolanAvraham.ConfigurationTransform.Services.Extensions;
+using GolanAvraham.ConfigurationTransform.Services.Helpers;
 using GolanAvraham.ConfigurationTransform.Wrappers;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Web.XmlTransform;
@@ -316,12 +318,16 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             }
         }
 
-        private static string GetTempFilePath(string fileNamePrefix)
+        private static string GetTempFilePath(string fileName)
         {
             var tempPath = Path.GetTempPath();
-            var tempFileName = string.Format("{0}.{1}", fileNamePrefix, Guid.NewGuid().ToString());
+            var tempFileName = PathHelper.AppendToFileName(fileName, string.Format("_{0}", Guid.NewGuid()));
             var tempFilePath = Path.Combine(tempPath, tempFileName);
             return tempFilePath;
         }
+
+
+
+
     }
 }
