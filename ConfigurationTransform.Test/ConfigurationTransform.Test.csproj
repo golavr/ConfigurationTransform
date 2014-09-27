@@ -66,6 +66,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeleteFileOnCloseBaseTest.cs" />
+    <Compile Include="DeleteFileOnDocumentCloseTest.cs" />
     <Compile Include="DeleteFileOnWindowFrameCloseTest.cs" />
     <Compile Include="MockHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

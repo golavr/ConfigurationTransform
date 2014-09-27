@@ -3,8 +3,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GolanAvraham.ConfigurationTransform.Services
 {
-    public interface IDeleteFileOnWindowFrameClose : IVsWindowFrameNotify
+    public interface IDeleteFileOnWindowFrameClose : IVsWindowFrameNotify, IDeleteFileOnClose
     {
-        string FilePath { get; }
     }
 }

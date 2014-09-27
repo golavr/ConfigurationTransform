@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using EnvDTE;
 using GolanAvraham.ConfigurationTransform.Services.Extensions;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -84,6 +85,15 @@ namespace GolanAvraham.ConfigurationTransform.Services
 
         public void OpenDiff(string leftFile, string rightFile, string leftLabel, string rightLabel)
         {
+            // first try to compare
+            if (CompareFilesDeleteOnClose(leftFile, rightFile, leftLabel, rightLabel)) return;
+            // fallback call for document open
+            var dte2 = DTEExtensions.GetInstance();
+            OpenFileDeleteOnClose(rightFile, dte2);
+        }
+
+        private bool CompareFilesDeleteOnClose(string leftFile, string rightFile, string leftLabel, string rightLabel)
+        {
             try
             {
                 // try to open diff within visual studio
@@ -91,19 +101,43 @@ namespace GolanAvraham.ConfigurationTransform.Services
                 try
                 {
                     windowFrame.TryRegisterCloseAndDeleteFile(rightFile);
-                    return;
+                    return true;
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine(string.Format("Cannot register for file delete. File: {0}. Exception message: {1}", rightFile, e.Message));
+                    Trace.WriteLine(string.Format("Cannot register for file delete. File: {0}. Exception message: {1}",
+                        rightFile, e.Message));
                 }
-                return;
+                return true;
             }
             catch (Exception e)
             {
                 Trace.WriteLine(string.Format("Cannot open diff within visual studio. Exception message: {0}", e.Message));
             }
-            var a = 1;
+            return false;
+        }
+
+        private static bool OpenFileDeleteOnClose(string rightFile, DTE dte2)
+        {
+            try
+            {
+                dte2.Documents.Open(rightFile, "Auto", true);
+                try
+                {
+                    VsServicesExtensions.TryRegisterCloseAndDeleteFile(rightFile);
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(string.Format("Cannot register for file delete. File: {0}. Exception message: {1}", rightFile,
+                        e.Message));
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(string.Format("Cannot open file within visual studio. Exception message: {0}", e.Message));
+            }
+            return false;
         }
     }
 }

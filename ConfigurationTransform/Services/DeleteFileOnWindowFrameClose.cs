@@ -1,26 +1,17 @@
-using System;
-using System.IO;
 using GolanAvraham.ConfigurationTransform.Wrappers;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GolanAvraham.ConfigurationTransform.Services
 {
-    public class DeleteFileOnWindowFrameClose : IDeleteFileOnWindowFrameClose
+    public class DeleteFileOnWindowFrameClose : DeleteFileOnClose, IDeleteFileOnWindowFrameClose
     {
-        private readonly IFileWrapper _fileWrapper;
-        public string FilePath { get; private set; }
-
         public DeleteFileOnWindowFrameClose(string filePath) : this(filePath, new FileWrapper())
         {
         }
 
-        public DeleteFileOnWindowFrameClose(string filePath, IFileWrapper fileWrapper)
+        public DeleteFileOnWindowFrameClose(string filePath, IFileWrapper fileWrapper) : base(filePath, fileWrapper)
         {
-            _fileWrapper = fileWrapper;
-            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException(filePath);
-            if (!_fileWrapper.Exists(filePath)) throw new FileNotFoundException(filePath);
-            FilePath = filePath;
         }
 
         public int OnShow(int fShow)
@@ -29,16 +20,10 @@ namespace GolanAvraham.ConfigurationTransform.Services
             switch (frameshow)
             {
                 case __FRAMESHOW.FRAMESHOW_WinClosed:
-                    DeleteFile(FilePath);
+                    DeleteFile();
                     break;
             }
             return VSConstants.S_OK;
-        }
-
-        private void DeleteFile(string filePath)
-        {
-            if(!_fileWrapper.Exists(FilePath)) return;
-            _fileWrapper.Delete(FilePath);
         }
 
         public int OnMove()
@@ -56,9 +41,5 @@ namespace GolanAvraham.ConfigurationTransform.Services
             return VSConstants.S_OK;
         }
 
-        public override string ToString()
-        {
-            return string.Format("FilePath: {0}", FilePath);
-        }
     }
 }

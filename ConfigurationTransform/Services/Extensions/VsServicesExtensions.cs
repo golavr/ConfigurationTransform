@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GolanAvraham.ConfigurationTransform.Services.Extensions
@@ -15,18 +16,37 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             return messageBoxResult;
         }
 
-        
-
         public static bool TryRegisterCloseAndDeleteFile(this IVsWindowFrame source, string path, IDeleteFileOnWindowFrameClose deleteHandler = null)
         {
-            // get window with notifications
-            var vsWindowFrame = source as IVsWindowFrame2;
+            try
+            {
+                // get window with notifications
+                var vsWindowFrame = source as IVsWindowFrame2;
 
-            if (vsWindowFrame == null) return false;
-            // register to window event, delete file when window close
-            var deleteFileOnWindowFrameClose = deleteHandler ?? new DeleteFileOnWindowFrameClose(path);
-            uint cookie;
-            vsWindowFrame.Advise(deleteFileOnWindowFrameClose, out cookie);
+                if (vsWindowFrame == null) return false;
+                // register to window event, delete file when window close
+                var deleteFileOnWindowFrameClose = deleteHandler ?? new DeleteFileOnWindowFrameClose(path);
+                uint cookie;
+                vsWindowFrame.Advise(deleteFileOnWindowFrameClose, out cookie);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
+        }
+        public static bool TryRegisterCloseAndDeleteFile(string path)
+        {
+            try
+            {
+                var dte2 = DTEExtensions.GetInstance();
+                var deleteFileOnDocumentClose = new DeleteFileOnDocumentClose(path, dte2.Events.DocumentEvents);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
             return true;
         }
     }

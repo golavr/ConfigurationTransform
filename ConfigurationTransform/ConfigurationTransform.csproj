@@ -130,6 +130,8 @@
     <Compile Include="ConfigurationTransformPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
+    <Compile Include="Services\DeleteFileOnClose.cs" />
+    <Compile Include="Services\DeleteFileOnDocumentClose.cs" />
     <Compile Include="Services\DeleteFileOnWindowFrameClose.cs" />
     <Compile Include="Services\Extensions\DTEExtensions.cs" />
     <Compile Include="Services\Extensions\ProjectExtensions.cs" />
@@ -139,6 +141,7 @@
     <Compile Include="Services\Extensions\PropertyExtensions.cs" />
     <Compile Include="Services\Extensions\SelectedItemsExtensions.cs" />
     <Compile Include="Services\Extensions\VsServicesExtensions.cs" />
+    <Compile Include="Services\IDeleteFileOnClose.cs" />
     <Compile Include="Services\IDeleteFileOnWindowFrameClose.cs" />
     <Compile Include="Services\IVsServices.cs" />
     <Compile Include="Services\Extensions\ProjectItemExtensions.cs" />

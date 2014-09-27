@@ -126,23 +126,5 @@ namespace ConfigurationTransform.Test
             //Assert
             Assert.IsFalse(result);
         }
-
-        [TestMethod]
-        public void OpenDiff_OpenComparisonWindow_Throw_Exception()
-        {
-            //Arrange
-            const string leftFile = "leftfile";
-            const string rightFile = "rightfile";
-            const string leftLabel = "leftlabel";
-            const string rightLabel = "rightlabel";
-            var mock = new Mock<VsServices>() {CallBase = true};
-            mock.Setup(s => s.OpenComparisonWindow(leftFile, rightFile, leftLabel, rightLabel)).Throws<Exception>();
-
-            //Act
-            mock.Object.OpenDiff(leftFile, rightFile, leftLabel, rightLabel);
-
-            //Assert
-            mock.VerifyAll();
-        }
     }
 }
