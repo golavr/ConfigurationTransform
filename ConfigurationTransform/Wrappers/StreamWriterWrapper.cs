@@ -3,7 +3,7 @@ using System.IO;
 
 namespace GolanAvraham.ConfigurationTransform.Wrappers
 {
-    public class StreamWriterWrapper : IStreamWriterWrapper, IDisposable
+    public sealed class StreamWriterWrapper : IStreamWriterWrapper, IDisposable
     {
         private readonly StreamWriter _streamWriter;
 
