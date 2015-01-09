@@ -16,6 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationTransform.Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionResources", "SolutionResources", "{48E4E05B-7604-477A-A450-6DDE8210C3CF}"
 	ProjectSection(SolutionItems) = preProject
+		SolutionResources\Microsoft.VisualStudio.Shell.10.0.dll = SolutionResources\Microsoft.VisualStudio.Shell.10.0.dll
 		SolutionResources\Microsoft.Web.XmlTransform.dll = SolutionResources\Microsoft.Web.XmlTransform.dll
 	EndProjectSection
 EndProject

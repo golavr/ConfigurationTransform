@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using EnvDTE;
-using EnvDTE80;
 
 namespace GolanAvraham.ConfigurationTransform.Services.Extensions
 {
