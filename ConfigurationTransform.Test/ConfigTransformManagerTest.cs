@@ -19,6 +19,7 @@ namespace ConfigurationTransform.Test
         const string JustConfig = @"config";
         const string CsFile = @"mockfile.cs";
         const string RootAppConfig = @"app.config";
+        const string RootLoggingConfig = @"logging.config";
         const string TransformAppConfig = @"app.MockBuild.config";
         const string TransformWithoutConfigExtension = @"app.MockBuild";
         const string FileWith3Dots = @"mockfile.mockMiddle.mock";
@@ -58,7 +59,7 @@ namespace ConfigurationTransform.Test
         }
 
         [TestMethod]
-        public void IsRootAppConfig_Returns_True()
+        public void IsRootAppConfig_WhenAppAndConfig_ReturnTrue()
         {
             //Arrange
             const string sourceConfigName = RootAppConfig;
@@ -71,7 +72,86 @@ namespace ConfigurationTransform.Test
         }
 
         [TestMethod]
-        public void IsTransformConfigName_Returns_True()
+        public void IsRootAppConfig_WhenNotAppAndConfig_ReturnFalse()
+        {
+            //Arrange
+            const string sourceConfigName = RootLoggingConfig;
+
+            //Act
+            var actual = ConfigTransformManager.IsRootAppConfig(sourceConfigName);
+
+            //Assert
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod]
+        public void IsRootConfig_WhenAppAndConfig_ReturnTrue()
+        {
+            //Arrange
+            const string sourceConfigName = RootAppConfig;
+
+            //Act
+            var actual = ConfigTransformManager.IsRootConfig(sourceConfigName);
+
+            //Assert
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod]
+        public void IsRootConfig_WhenAnyNameAndConfig_ReturnTrue()
+        {
+            //Arrange
+            const string sourceConfigName = RootLoggingConfig;
+
+            //Act
+            var actual = ConfigTransformManager.IsRootConfig(sourceConfigName);
+
+            //Assert
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod]
+        public void IsRootConfig_WhenHavingConfigurationInNameAndNotEndingWithConfig_ReturnFalse()
+        {
+            //Arrange
+            const string sourceConfigName = TransformWithoutConfigExtension;
+
+            //Act
+            bool actual;
+            actual = ConfigTransformManager.IsRootConfig(sourceConfigName);
+
+            //Assert
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod]
+        public void IsRootConfig_WhenItIsTransformConfig_ReturnFalse()
+        {
+            //Arrange
+            const string sourceConfigName = TransformAppConfig;
+
+            //Act
+            var actual = ConfigTransformManager.IsRootConfig(sourceConfigName);
+
+            //Assert
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod]
+        public void IsRootConfig_WhenItIsCsFile_ReturnFalse()
+        {
+            //Arrange
+            const string sourceConfigName = CsFile;
+
+            //Act
+            var actual = ConfigTransformManager.IsRootConfig(sourceConfigName);
+
+            //Assert
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod]
+        public void IsTransformConfigName_WhenHavingConfigurationInName_ReturnTrue()
         {
             //Arrange
             const string sourceConfigName = TransformAppConfig;
@@ -84,33 +164,26 @@ namespace ConfigurationTransform.Test
         }
 
         [TestMethod]
-        public void IsTransformConfigName_Returns_False()
+        public void IsTransformConfigName_WhenNotHavingConfigurationInName_ReturnFalse()
         {
             //Arrange
-            const string sourceConfigName1 = RootAppConfig;
-            const string sourceConfigName2 = FileWith3Dots;
+            const string sourceConfigName = RootAppConfig;
 
             //Act
-            var actual = ConfigTransformManager.IsTransformConfigName(sourceConfigName1);
-            actual &= ConfigTransformManager.IsTransformConfigName(sourceConfigName2);
+            var actual = ConfigTransformManager.IsTransformConfigName(sourceConfigName);
 
             //Assert
             Assert.IsFalse(actual);
         }
 
         [TestMethod]
-        public void IsRootAppConfig_Returns_False()
+        public void IsTransformConfigName_WhenNotEndingWithConfig_ReturnFalse()
         {
             //Arrange
-            const string sourceConfigName1 = TransformWithoutConfigExtension;
-            const string sourceConfigName2 = TransformAppConfig;
-            const string sourceConfigName3 = CsFile;
+            const string sourceConfigName = FileWith3Dots;
 
             //Act
-            bool actual;
-            actual = ConfigTransformManager.IsRootAppConfig(sourceConfigName1);
-            actual &= ConfigTransformManager.IsRootAppConfig(sourceConfigName2);
-            actual &= ConfigTransformManager.IsRootAppConfig(sourceConfigName3);
+            var actual = ConfigTransformManager.IsTransformConfigName(sourceConfigName);
 
             //Assert
             Assert.IsFalse(actual);

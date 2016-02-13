@@ -143,7 +143,7 @@ namespace GolanAvraham.ConfigurationTransform
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
-                if (ConfigTransformManager.IsRootAppConfig(_selectedProjectItem.Name))
+                if (ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name))
                 {
                     menuCommand.Visible = true;
                 }
