@@ -15,6 +15,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         void AddDependentUponConfig(string[] buildConfigurationNames, string appConfigName);
         void AddTransformTask();
         void AddAfterCompileTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false);
+        void AddAfterBuildTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false);
         void AddAfterPublishTarget();
     }
 
@@ -192,6 +193,44 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             _projectRoot.Add(targetNod);
         }
 
+        public void AddAfterBuildTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false)
+        {
+            var configSplit = appConfigName.Split('.');
+            var configName = configSplit[0];
+            var configExt = configSplit[1];
+
+            if (relativePrefix != null)
+            {
+                relativePrefix += @"\";
+            }
+            // logging.$(Configuration).config
+            var configFormat = string.Format(@"{0}{1}.$(Configuration).{2}", relativePrefix, configName, configExt);
+            var transformConfig = configFormat;
+            if (!transformConfigIsLink)
+            {
+                transformConfig = string.Format("{0}.$(Configuration).{1}", configName, configExt);
+            }
+
+            var condition = string.Format("Exists('{0}')", configFormat);
+
+            var configWithPrefix = string.Format(@"{0}{1}", relativePrefix, appConfigName);
+            // check if already exists
+            if (HasAfterBuildTarget(condition)) return;
+            _isDirty = true;
+
+            var destination = string.Format(@"$(OutputPath){0}.{1}", configName, configExt);
+            const string generateComment = @"Generate transformed config in the output directory";
+            var targetNod = CreateElement("Target",
+                                         new XAttribute("Name", "AfterBuild"),
+                                         new XAttribute("Condition", condition),
+                                         new XComment(generateComment),
+                                         CreateElement("TransformXml", new XAttribute("Source", configWithPrefix),
+                                                      new XAttribute("Destination", destination),
+                                                      new XAttribute("Transform", transformConfig))
+                );
+            _projectRoot.Add(targetNod);
+        }
+
         public void AddAfterPublishTarget()
         {
             // check if already exists
@@ -227,6 +266,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             return missingConfigs;
         }
 
+        //TODO:[Golan] - remove all protected methods to new class with public methods
         protected virtual bool HasDependentUponConfig(string buildConfig)
         {
             return
@@ -280,6 +320,19 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             return
                 _projectRoot.ElementsAnyNs("Target").Any(
                     target => target.HasAttributes && target.Attributes("Name").Any(name => name.Value == "AfterCompile") &&
+                         target.Attributes("Condition").Any(condition => condition.Value == conditionConfig) && target.HasElements &&
+                         target.ElementsAnyNs("TransformXml").Any(
+                             transformXml =>
+                             transformXml.HasAttributes && transformXml.Attributes("Source").Any() &&
+                             transformXml.Attributes("Destination").Any() &&
+                             transformXml.Attributes("Transform").Any()));
+        }
+
+        protected virtual bool HasAfterBuildTarget(string conditionConfig)
+        {
+            return
+                _projectRoot.ElementsAnyNs("Target").Any(
+                    target => target.HasAttributes && target.Attributes("Name").Any(name => name.Value == "AfterBuild") &&
                          target.Attributes("Condition").Any(condition => condition.Value == conditionConfig) && target.HasElements &&
                          target.ElementsAnyNs("TransformXml").Any(
                              transformXml =>

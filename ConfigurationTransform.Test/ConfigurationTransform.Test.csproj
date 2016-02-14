@@ -81,9 +81,6 @@
     <Compile Include="VsProjectXmlTransformTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Shadow Include="Test References\ConfigurationTransform.accessor" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\ConfigurationTransform\ConfigurationTransform.csproj">
       <Project>{E4538816-241F-40B4-B962-65CCF294FBBA}</Project>
       <Name>ConfigurationTransform</Name>

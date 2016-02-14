@@ -73,28 +73,31 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 if (createAsLinkedConfig)
                 {
                     // since it's link files we only need to copy them as like files to project
-                    CreateLinkedAppConfigFiles(projectItem);
+                    CreateLinkedConfigFiles(projectItem);
                 }
                 else
                 {
                     // create missing config files
-                    CreateAppConfigFiles(project, projectItem);
+                    CreateConfigFiles(project, projectItem);
                 }
 
                 // project file(e.g. c:\myproject\myproject.csproj)
                 var fileName = project.FullName;
-                // app config name (e.g. app.config)
-                var appConfigName = projectItem.Name;
+                // config name (e.g. app.config or logging.config)
+                var configName = projectItem.Name;
 
                 ProjectXmlTransform.Open(fileName);
                 ProjectXmlTransform.AddTransformTask();
-                ProjectXmlTransform.AddAfterCompileTarget(appConfigName, relativePrefix, createAsLinkedConfig);
-                // project is a windows application or console application? if so add click once transform task
-                // removed this check for deployed class library projects (Word Add-In)
-                //if (project.IsProjectOutputTypeExecutable())
-                //{
-                ProjectXmlTransform.AddAfterPublishTarget();
-                //}
+                if (IsRootAppConfig(configName))
+                {
+                    ProjectXmlTransform.AddAfterCompileTarget(configName, relativePrefix, createAsLinkedConfig);
+                    // project is a windows application or console application? if so add click once transform task
+                    ProjectXmlTransform.AddAfterPublishTarget();
+                }
+                else
+                {
+                    ProjectXmlTransform.AddAfterBuildTarget(configName, relativePrefix, createAsLinkedConfig);
+                }
 
                 // save project file
                 var isSaved = ProjectXmlTransform.Save();
@@ -112,7 +115,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             }
         }
 
-        public static void CreateLinkedAppConfigFiles(ProjectItem targetProjectItem)
+        public static void CreateLinkedConfigFiles(ProjectItem targetProjectItem)
         {
             // get source root config project item
             var sourceRootConfig = targetProjectItem.GetProjectItemContainingFullPath();
@@ -120,13 +123,13 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             // sorce config is not included in project
             if (sourceRootConfig == null)
             {
-                CreateLikedAppConfigFilesNotFromProject(targetProjectItem);
+                CreateLikedConfigFilesNotFromProject(targetProjectItem);
             }
             else
             {
                 if (sourceRootConfig.ProjectItems == null) return;
 
-                CreateLikedAppConfigFilesFromProject(targetProjectItem, sourceRootConfig);
+                CreateLikedConfigFilesFromProject(targetProjectItem, sourceRootConfig);
             }
 
             // get item containing project
@@ -135,7 +138,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             if (targetProject.IsDirty) targetProject.Save();
         }
 
-        private static void CreateLikedAppConfigFilesFromProject(ProjectItem targetProjectItem, ProjectItem sourceRootConfig)
+        private static void CreateLikedConfigFilesFromProject(ProjectItem targetProjectItem, ProjectItem sourceRootConfig)
         {
             // iterate source root config items
             foreach (var item in sourceRootConfig.ProjectItems.AsEnumerable())
@@ -152,18 +155,18 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             }
         }
 
-        private static void CreateLikedAppConfigFilesNotFromProject(ProjectItem targetProjectItem)
+        private static void CreateLikedConfigFilesNotFromProject(ProjectItem targetProjectItem)
         {
-            var appConfigName = targetProjectItem.Name;
-            var sourceAppConfigPath = targetProjectItem.GetFullPath();
+            var configName = targetProjectItem.Name;
+            var sourceConfigPath = targetProjectItem.GetFullPath();
             var project = targetProjectItem.ContainingProject;
             var buildConfigurationNames = project.GetBuildConfigurationNames();
             
-            var sourceConfigDirectory = Directory.GetParent(sourceAppConfigPath).FullName;
+            var sourceConfigDirectory = Directory.GetParent(sourceConfigPath).FullName;
 
             foreach (var buildConfigurationName in buildConfigurationNames)
             {
-                var dependentConfig = GetTransformConfigName(appConfigName, buildConfigurationName);
+                var dependentConfig = GetTransformConfigName(configName, buildConfigurationName);
                 var sourceDependentConfigFullPath = Path.Combine(sourceConfigDirectory, dependentConfig);
                 // check if source config file exist and not exist in target
                 if (FileWrapper.Exists(sourceDependentConfigFullPath) &&
@@ -175,9 +178,9 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         }
 
 
-        // disclaimer: visual studio don't support adding dependent file under linked file
+        // disclaimer: visual studio doesn't support adding dependent file under linked file
         // so no dependent transformed config under linked app.config in designer
-        private static void CreateAppConfigFiles(Project project, ProjectItem projectItem)
+        private static void CreateConfigFiles(Project project, ProjectItem projectItem)
         {
             string appConfigName = projectItem.Name;
             var buildConfigurationNames = project.GetBuildConfigurationNames();
@@ -219,17 +222,17 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
         public static string GetTransformConfigName(string sourceConfigName, string buildConfigurationName)
         {
-            var appConfigSplit = sourceConfigName.Split('.');
-            if (appConfigSplit.Length < 2) throw new NotSupportedException(sourceConfigName);
-            var dependentConfig = string.Format("{0}.{1}.{2}", appConfigSplit[0], buildConfigurationName,
-                                                    appConfigSplit[1]);
+            var configSplit = sourceConfigName.Split('.');
+            if (configSplit.Length < 2) throw new NotSupportedException(sourceConfigName);
+            var dependentConfig = string.Format("{0}.{1}.{2}", configSplit[0], buildConfigurationName,
+                                                    configSplit[1]);
             return dependentConfig;
         }
 
         public static bool IsTransformConfigName(string configName)
         {
-            var appConfigSplit = configName.Split('.');
-            if (appConfigSplit.Length < 3) return false;
+            var configSplit = configName.Split('.');
+            if (configSplit.Length < 3) return false;
             if (!configName.EndsWith(".config")) return false;
 
             return true;

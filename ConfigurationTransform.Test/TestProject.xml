@@ -538,6 +538,10 @@
   </Target>
   -->
   <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll" />
+  <Target Name="AfterBuild" Condition="Exists('log.$(Configuration).config')">
+    <!--Generate transformed app config in the intermediate directory-->
+    <TransformXml Source="log.config" Destination="$(OutputPath)log.config" Transform="log.$(Configuration).config" />
+  </Target>
   <Target Name="AfterCompile" Condition="Exists('App.$(Configuration).config')">
     <!-- Generate transformed app config in the intermediate directory -->
     <TransformXml Source="App.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="App.$(Configuration).config" />

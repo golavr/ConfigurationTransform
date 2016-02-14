@@ -19,7 +19,7 @@ namespace ConfigurationTransform.Test
         const string JustConfig = @"config";
         const string CsFile = @"mockfile.cs";
         const string RootAppConfig = @"app.config";
-        const string RootLoggingConfig = @"logging.config";
+        const string RootAnyConfig = @"any.config";
         const string TransformAppConfig = @"app.MockBuild.config";
         const string TransformWithoutConfigExtension = @"app.MockBuild";
         const string FileWith3Dots = @"mockfile.mockMiddle.mock";
@@ -75,7 +75,7 @@ namespace ConfigurationTransform.Test
         public void IsRootAppConfig_WhenNotAppAndConfig_ReturnFalse()
         {
             //Arrange
-            const string sourceConfigName = RootLoggingConfig;
+            const string sourceConfigName = RootAnyConfig;
 
             //Act
             var actual = ConfigTransformManager.IsRootAppConfig(sourceConfigName);
@@ -101,7 +101,7 @@ namespace ConfigurationTransform.Test
         public void IsRootConfig_WhenAnyNameAndConfig_ReturnTrue()
         {
             //Arrange
-            const string sourceConfigName = RootLoggingConfig;
+            const string sourceConfigName = RootAnyConfig;
 
             //Act
             var actual = ConfigTransformManager.IsRootConfig(sourceConfigName);
@@ -190,55 +190,53 @@ namespace ConfigurationTransform.Test
         }
 
         [TestMethod]
-        public void CreateLinkedAppConfigFiles_Call_AddFromFile_On_TargetProjectLinkedFile_Save_TargetProject()
+        public void CreateLinkedConfigFiles_WhenAppConfig_ThenAddFilesAndSaveTargetProject()
         {
             //Arrange
-            Mock<ProjectItems> projectItemsTargetChilds;
-            Mock<Project> projectTarget;
-            var projectItemTarget = CreateSolution(out projectItemsTargetChilds, out projectTarget);
+            var solutionTestHelper = new SolutionTestHelper();
+            solutionTestHelper.CreateSolution();
+
             var fileWrapperMock = new Mock<IFileWrapper>();
             fileWrapperMock.Setup(wrapper => wrapper.Exists(It.IsAny<string>())).Returns(true);
             ConfigTransformManager.FileWrapper = fileWrapperMock.Object;
 
             //Act
-            ConfigTransformManager.CreateLinkedAppConfigFiles(projectItemTarget.Object);
+            ConfigTransformManager.CreateLinkedConfigFiles(solutionTestHelper.AppConfigProjectItemMock.Object);
 
             //Assert
-            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.debug.config"));
-            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.release.config"));
+            solutionTestHelper.AppConfigProjectItemChildsMock.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.debug.config"));
+            solutionTestHelper.AppConfigProjectItemChildsMock.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.release.config"));
 
-            projectTarget.Verify(v=>v.Save(""));
+            solutionTestHelper.ProjectTargetMock.Verify(v=>v.Save(""));
         }
 
         [TestMethod]
-        public void CreateLinkedAppConfigFilesNotFromProject_Call_AddFromFile_On_TargetProjectLinkedFile_Save_TargetProject()
+        public void CreateLinkedConfigFiles_WhenAnyConfig_ThenAddFilesAndSaveTargetProject()
         {
             //Arrange
-            Mock<ProjectItems> projectItemsTargetChilds;
-            Mock<Project> projectTarget;
-            var projectItemTarget = CreateSolution(out projectItemsTargetChilds, out projectTarget, false);
+            var solutionTestHelper = new SolutionTestHelper();
+            solutionTestHelper.CreateSolution();
+
             var fileWrapperMock = new Mock<IFileWrapper>();
             fileWrapperMock.Setup(wrapper => wrapper.Exists(It.IsAny<string>())).Returns(true);
             ConfigTransformManager.FileWrapper = fileWrapperMock.Object;
 
             //Act
-            ConfigTransformManager.CreateLinkedAppConfigFiles(projectItemTarget.Object);
+            ConfigTransformManager.CreateLinkedConfigFiles(solutionTestHelper.AnyConfigProjectItemMock.Object);
 
             //Assert
-            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.Debug.config"));
-            projectItemsTargetChilds.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.Release.config"));
+            solutionTestHelper.AnyConfigProjectItemChildsMock.Verify(v => v.AddFromFile(@"c:\myproject\my.common\any.debug.config"));
+            solutionTestHelper.AnyConfigProjectItemChildsMock.Verify(v => v.AddFromFile(@"c:\myproject\my.common\any.release.config"));
 
-            projectTarget.Verify(v => v.Save(""));
+            solutionTestHelper.ProjectTargetMock.Verify(v=>v.Save(""));
         }
 
         [TestMethod]
-        public void EditProjectFile_Call_ShowMessageBox_XmlAddTargets()
+        public void EditProjectFile_WhenAppConfig_ThenShowMessageBoxAndAddXmlDataToProjectFileAndSave()
         {
             //Arrange
             var vsServices = new Mock<IVsServices>();
             var projectXml = new Mock<IVsProjectXmlTransform>();
-
-            //projectXml.Setup(s => s.Save()).Returns(true).Verifiable();
 
             ConfigTransformManager.VsService = vsServices.Object;
             ConfigTransformManager.ProjectXmlTransform = projectXml.Object;
@@ -248,191 +246,234 @@ namespace ConfigurationTransform.Test
                 s.ShowMessageBox(It.IsAny<string>(), It.IsAny<string>(), OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
                                  OLEMSGICON.OLEMSGICON_QUERY)).Returns(6).Verifiable();
 
-            Mock<ProjectItems> projectItemsTargetChilds;
-            Mock<Project> projectTarget;
-            var projectItem = CreateSolution(out projectItemsTargetChilds, out projectTarget);
+            var solutionTestHelper = new SolutionTestHelper();
+            solutionTestHelper.CreateSolution();
 
             //Act
-            var isSaved = ConfigTransformManager.EditProjectFile(projectItem.Object);
+            var isSaved = ConfigTransformManager.EditProjectFile(solutionTestHelper.AppConfigProjectItemMock.Object);
 
             //Assert
-            //vsServices.Verify(v=>v.ShowMessageBox(It.IsAny<string>(),It.IsAny<string>(), OLEMSGBUTTON.OLEMSGBUTTON_YESNO, OLEMSGICON.OLEMSGICON_QUERY));
             projectXml.Verify(v => v.AddTransformTask());
             projectXml.Verify(v => v.AddAfterCompileTarget(RootAppConfig, @"..\my.common", true));
-            projectXml.Verify(v => v.AddAfterPublishTarget());//RootAppConfig));
-            //Assert.IsTrue(isSaved);
+            projectXml.Verify(v => v.AddAfterPublishTarget());
+            projectXml.Verify(v => v.Save());
+        }
+
+        [TestMethod]
+        public void EditProjectFile_WhenAnyConfig_ThenShowMessageBoxAndAddXmlDataToProjectFileAndSave()
+        {
+            //Arrange
+            var vsServices = new Mock<IVsServices>();
+            var projectXml = new Mock<IVsProjectXmlTransform>();
+
+            ConfigTransformManager.VsService = vsServices.Object;
+            ConfigTransformManager.ProjectXmlTransform = projectXml.Object;
+
+            vsServices.Setup(
+                s =>
+                s.ShowMessageBox(It.IsAny<string>(), It.IsAny<string>(), OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
+                                 OLEMSGICON.OLEMSGICON_QUERY)).Returns(6).Verifiable();
+
+            var solutionTestHelper = new SolutionTestHelper();
+            solutionTestHelper.CreateSolution();
+
+            //Act
+            var isSaved = ConfigTransformManager.EditProjectFile(solutionTestHelper.AnyConfigProjectItemMock.Object);
+
+            //Assert
+            projectXml.Verify(v => v.AddTransformTask());
+            projectXml.Verify(v => v.AddAfterBuildTarget(RootAnyConfig, @"..\my.common", true));
+            projectXml.Verify(v => v.Save());
         }
 
         [TestMethod]
         public void GetRelativePath_Returns_RelativePath()
         {
             //Arrange
-            Mock<ProjectItems> projectItemsTargetChilds;
-            Mock<Project> projectTarget;
-            var projectItem = CreateSolution(out projectItemsTargetChilds, out projectTarget);
+            var solutionTestHelper = new SolutionTestHelper();
+            solutionTestHelper.CreateSolution();
 
             //Act
-            var relativePath = projectItem.Object.GetRelativePath();
+            var relativePath = solutionTestHelper.AppConfigProjectItemMock.Object.GetRelativePath();
 
             //Assert
             Assert.AreEqual(relativePath, @"..\my.common\app.config");
         }
 
-        private static Mock<ProjectItem> CreateSolution(out Mock<ProjectItems> projectItemsTargetChilds, out Mock<Project> projectTarget, bool createWithConcreteConfigs = true)
+        public class SolutionTestHelper
         {
-            var dte = new Mock<DTE>();
-            var solution = new Mock<Solution>();
+            public Mock<Project> ProjectTargetMock { get; private set; }
+            public Mock<ProjectItem> AppConfigProjectItemMock { get; private set; }
+            public Mock<ProjectItems> AppConfigProjectItemChildsMock { get; private set; }
+            public Mock<ProjectItem> AnyConfigProjectItemMock { get; private set; }
+            public Mock<ProjectItems> AnyConfigProjectItemChildsMock { get; private set; }
 
-            // source
-            var projectSource = createWithConcreteConfigs
-                                              ? CreateProjectWithConcreteConfigs(dte,
-                                                                                 @"c:\myproject\my.common\app.debug.config",
-                                                                                 @"c:\myproject\my.common\app.release.config")
-                                              : null;
-
-            // target
-            Mock<ProjectItem> projectItemTarget;
-            projectTarget = CreateProjectWithLinkedConfig(dte, out projectItemTarget, out projectItemsTargetChilds);
-
-
-            //projects - source + target
-            var projects = CreateEnumerableMock<Projects, Project>(projectSource !=null ? projectSource.Object: null, projectTarget.Object);
-
-            solution.SetupGet(s => s.Projects).Returns(projects.Object);
-            dte.SetupGet(s => s.Solution).Returns(solution.Object);
-            return projectItemTarget;
-        }
-
-        private static Mock<Project> CreateProjectWithConcreteConfigs(Mock<DTE> dte, params string[] childsFullPaths)
-        {
-            // 
-            // source - project with actual config
-            //
-            var projectSource = new Mock<Project>();
-
-            //property - source
-            var propSourceFullPath = CreatePropertyMock(FullPath, @"c:\myproject\my.common\app.config");
-            var propSourceIsLink = CreatePropertyMock(IsLink, false);
-
-            //properties - source
-            var propertiesSource = CreateEnumerableMock<Properties, Property>(propSourceFullPath.Object,
-                                                                              propSourceIsLink.Object);
-
-            var projectItemChilds = new List<ProjectItem>();
-            //property - source child
-            foreach (var childFullPath in childsFullPaths)
+            public Mock<Solution> CreateSolution(bool createWithConcreteConfigs = true)
             {
-                var propSourceChildFullPath = CreatePropertyMock(FullPath, childFullPath);
-                var projectItemSourceChild = new Mock<ProjectItem>();
-                var sourceChildProperties = CreateEnumerableMock<Properties, Property>(propSourceChildFullPath.Object);
-                projectItemSourceChild.SetupGet(s => s.Properties).Returns(sourceChildProperties.Object);
+                var dte = new Mock<DTE>();
+                var solution = new Mock<Solution>();
 
-                projectItemChilds.Add(projectItemSourceChild.Object);
+                // source
+                var projectSource = createWithConcreteConfigs ? CreateProjectWithConcreteConfigs(dte.Object) : null;
+
+                // target
+                CreateProjectWithLinkedConfig(dte.Object);
+
+                //projects - source + target
+                var projects = CreateEnumerableMock<Projects, Project>(projectSource?.Object, ProjectTargetMock.Object);
+
+                solution.SetupGet(s => s.Projects).Returns(projects.Object);
+                dte.SetupGet(s => s.Solution).Returns(solution.Object);
+                return solution;
             }
-            //var propSourceChild1FullPath = CreatePropertyMock(FullPath, "sourceChild1FileLocation");
-            //var projectItemSourceChild1 = new Mock<ProjectItem>();
-            //var sourceChild1Properties = CreateEnumerableMock<Properties, Property>(propSourceChild1FullPath.Object);
-            //projectItemSourceChild1.SetupGet(s => s.Properties).Returns(sourceChild1Properties.Object);
 
-            //var propSourceChild2FullPath = CreatePropertyMock(FullPath, "sourceChild2FileLocation");
-            //var projectItemSourceChild2 = new Mock<ProjectItem>();
-            //var sourceChild2Properties = CreateEnumerableMock<Properties, Property>(propSourceChild2FullPath.Object);
-            //projectItemSourceChild2.SetupGet(s => s.Properties).Returns(sourceChild2Properties.Object);
+            private Mock<Project> CreateProjectWithConcreteConfigs(DTE dte)
+            {
+                // 
+                // source - project with actual config
+                //
+                var projectSource = new Mock<Project>();
 
-            var projectItemRootSource = new Mock<ProjectItem>();
-            projectItemRootSource.SetupGet(s => s.ContainingProject).Returns(projectSource.Object);
-            projectItemRootSource.SetupGet(s => s.DTE).Returns(dte.Object);
-            projectItemRootSource.SetupGet(s => s.Properties).Returns(propertiesSource.Object);
+                var appConfigProjectItemMock = CreateProjectItemMock(dte, projectSource.Object, RootAppConfig,
+                    @"c:\myproject\my.common\app.config", false);
 
-            // -> projectItems - source child
-            //var projectItemsChildsSource = CreateEnumerableMock<ProjectItems, ProjectItem>(projectItemSourceChild1.Object,
-            //                                                                               projectItemSourceChild2.Object);
-            var projectItemsChildsSource = CreateEnumerableMock<ProjectItems, ProjectItem>(projectItemChilds.ToArray());
+                AddChildProjectItem(dte, projectSource.Object, appConfigProjectItemMock, "app.debug.config",
+                    @"c:\myproject\my.common\app.debug.config");
+                AddChildProjectItem(dte, projectSource.Object, appConfigProjectItemMock, "app.release.config",
+                    @"c:\myproject\my.common\app.release.config");
 
+                var anyConfigProjectItemMock = CreateProjectItemMock(dte, projectSource.Object, RootAnyConfig,
+                    @"c:\myproject\my.common\any.config", false);
 
-            //projectItem - source
-            projectItemRootSource.SetupGet(s => s.ProjectItems).Returns(projectItemsChildsSource.Object);
+                AddChildProjectItem(dte, projectSource.Object, anyConfigProjectItemMock, "any.debug.config",
+                    @"c:\myproject\my.common\any.debug.config");
+                AddChildProjectItem(dte, projectSource.Object, anyConfigProjectItemMock, "any.release.config",
+                    @"c:\myproject\my.common\any.release.config");
 
-            //projectItems - source
-            var projectItemsSource = CreateEnumerableMock<ProjectItems, ProjectItem>(projectItemRootSource.Object);
+                //projectItems - source
+                var projectItemsSource = CreateEnumerableMock<ProjectItems, ProjectItem>(
+                    appConfigProjectItemMock.Object, anyConfigProjectItemMock.Object);
 
-            // project - source
-            projectSource.SetupGet(s => s.ProjectItems).Returns(projectItemsSource.Object);
-            projectSource.SetupGet(s => s.FullName).Returns(@"c:\myproject\my.common\my.common.csproj");
-            return projectSource;
+                // project - source
+                projectSource.SetupGet(s => s.ProjectItems).Returns(projectItemsSource.Object);
+                projectSource.SetupGet(s => s.FullName).Returns(@"c:\myproject\my.common\my.common.csproj");
+                return projectSource;
+            }
+
+            private Mock<ProjectItem> CreateProjectItemMock(DTE dte, Project project, string name,
+                string fullPath, bool isLink)
+            {
+                //property - source
+                var fullPathPropertyMock = CreatePropertyMock(FullPath, fullPath);
+                var isLinkPropertyMock = CreatePropertyMock(IsLink, isLink);
+
+                //properties - source
+                var propertiesMock = CreateEnumerableMock<Properties, Property>(fullPathPropertyMock.Object,
+                    isLinkPropertyMock.Object);
+
+                var projectItemMock = new Mock<ProjectItem>();
+                projectItemMock.SetupGet(s => s.ContainingProject).Returns(project);
+                projectItemMock.SetupGet(s => s.DTE).Returns(dte);
+                projectItemMock.SetupGet(s => s.Name).Returns(name);
+                projectItemMock.SetupGet(s => s.Properties).Returns(propertiesMock.Object);
+
+                return projectItemMock;
+            }
+
+            private void AddChildProjectItem(DTE dte, Project project, Mock<ProjectItem> parentProjectItem,
+                string name, string fullPath, bool isLink = false)
+            {
+                var projectItemChilds = new List<ProjectItem>();
+                if (parentProjectItem.Object.ProjectItems != null)
+                {
+                    projectItemChilds.AddRange(parentProjectItem.Object.ProjectItems.AsEnumerable());
+                }
+                var childProjectItemMock = CreateProjectItemMock(dte, project, name, fullPath, isLink);
+                projectItemChilds.Add(childProjectItemMock.Object);
+
+                var projectItemsChildsMock =
+                    CreateEnumerableMock<ProjectItems, ProjectItem>(projectItemChilds.ToArray());
+                parentProjectItem.SetupGet(s => s.ProjectItems).Returns(projectItemsChildsMock.Object);
+            }
+
+            private void CreateProjectWithLinkedConfig(DTE dte)
+            {
+                // 
+                // target - project with linked config
+                //
+                var projectTargetMock = new Mock<Project>();
+
+                var appConfigProjectItemMock = CreateProjectItemMock(dte, projectTargetMock.Object, RootAppConfig,
+                    @"c:\myproject\my.common\app.config", true);
+
+                var appConfigProjectItemChildsMock = CreateEnumerableMock<ProjectItems, ProjectItem>();
+                appConfigProjectItemMock.SetupGet(s => s.ProjectItems)
+                    .Returns(appConfigProjectItemChildsMock.Object);
+
+                appConfigProjectItemChildsMock.Setup(s => s.AddFromFile(It.IsAny<string>()))
+                    .Callback(() => projectTargetMock.SetupGet(s => s.IsDirty).Returns(true));
+
+                var anyConfigProjectItemMock = CreateProjectItemMock(dte, projectTargetMock.Object, RootAnyConfig,
+                    @"c:\myproject\my.common\any.config", true);
+
+                var anyConfigProjectItemChildsMock = CreateEnumerableMock<ProjectItems, ProjectItem>();
+                anyConfigProjectItemMock.SetupGet(s => s.ProjectItems)
+                    .Returns(anyConfigProjectItemChildsMock.Object);
+
+                anyConfigProjectItemChildsMock.Setup(s => s.AddFromFile(It.IsAny<string>()))
+                    .Callback(() => projectTargetMock.SetupGet(s => s.IsDirty).Returns(true));
+
+                //projectItems - target
+                var projectItemsTarget = CreateEnumerableMock<ProjectItems, ProjectItem>(appConfigProjectItemMock.Object, anyConfigProjectItemMock.Object);
+
+                // project - target
+                var projPropOutputType = CreatePropertyMock("OutputType", 0);
+                var projProperties = CreateEnumerableMock<Properties, Property>(projPropOutputType.Object);
+                projectTargetMock.SetupGet(s => s.Properties).Returns(projProperties.Object);
+                projectTargetMock.SetupGet(s => s.ProjectItems).Returns(projectItemsTarget.Object);
+                projectTargetMock.SetupGet(s => s.FullName).Returns(@"c:\myproject\my.console\my.console.csproj");
+                var configurationManager = new Mock<ConfigurationManager>();
+                configurationManager.SetupGet(s => s.ConfigurationRowNames).Returns(ConfigNames);
+                projectTargetMock.SetupGet(s => s.ConfigurationManager).Returns(configurationManager.Object);
+
+                AppConfigProjectItemMock = appConfigProjectItemMock;
+                AppConfigProjectItemChildsMock = appConfigProjectItemChildsMock;
+                AnyConfigProjectItemMock = anyConfigProjectItemMock;
+                AnyConfigProjectItemChildsMock = anyConfigProjectItemChildsMock;
+                ProjectTargetMock = projectTargetMock;
+            }
+
+            private Mock<TEnumerable> CreateEnumerableMock<TEnumerable, TItem>(params TItem[] items)
+                where TEnumerable : class, IEnumerable
+                where TItem : class
+            {
+                var enumerableMock = new Mock<TEnumerable>();
+                var enumerableInterface = enumerableMock.As<IEnumerable>();
+                enumerableInterface.Setup(s => s.GetEnumerator())
+                    .Returns(() => items.Where(w => w != null).GetEnumerator());
+
+                return enumerableMock;
+            }
+
+            private Mock<TEnumerable> CreateEnumerableMock<TEnumerable, TItem>()
+                where TEnumerable : class, IEnumerable
+                where TItem : class
+            {
+                var enumerableMock = CreateEnumerableMock<TEnumerable, TItem>(new TItem[] {});
+
+                return enumerableMock;
+            }
+
+            private Mock<Property> CreatePropertyMock(string name, object value)
+            {
+                var property = new Mock<Property>();
+                property.SetupGet(s => s.Name).Returns(name);
+                property.SetupGet(s => s.Value).Returns(value);
+
+                return property;
+            }
         }
 
-        private static Mock<Project> CreateProjectWithLinkedConfig(Mock<DTE> dte, out Mock<ProjectItem> projectItem,
-                                                          out Mock<ProjectItems> projectItemChilds)
-        {
-            // 
-            // target - project with linked config
-            //
-            var projectTarget = new Mock<Project>();
-
-            //property - target
-            var propTargetFullPath = CreatePropertyMock(FullPath, @"c:\myproject\my.common\app.config");
-            var propTargetIsLink = CreatePropertyMock(IsLink, true);
-
-            //properties - target
-            var propertiesTarget = CreateEnumerableMock<Properties, Property>(propTargetFullPath.Object, propTargetIsLink.Object);
-
-            //projectItem - target
-            projectItem = new Mock<ProjectItem>();
-            projectItem.SetupGet(s => s.ContainingProject).Returns(projectTarget.Object);
-            projectItem.SetupGet(s => s.DTE).Returns(dte.Object);
-            projectItem.SetupGet(s => s.Properties).Returns(propertiesTarget.Object);
-            projectItem.SetupGet(s => s.Name).Returns(RootAppConfig);
-            projectItemChilds = CreateEnumerableMock<ProjectItems, ProjectItem>();
-            projectItem.SetupGet(s => s.ProjectItems)
-                             .Returns(projectItemChilds.Object);
-
-            projectItemChilds.Setup(s => s.AddFromFile(It.IsAny<string>()))
-                                    .Callback(() => projectTarget.SetupGet(s => s.IsDirty).Returns(true));
-
-            //projectItems - target
-            var projectItemsTarget = CreateEnumerableMock<ProjectItems, ProjectItem>(projectItem.Object);
-
-            // project - target
-            var projPropOutputType = CreatePropertyMock("OutputType", 0);
-            var projProperties = CreateEnumerableMock<Properties, Property>(projPropOutputType.Object);
-            projectTarget.SetupGet(s => s.Properties).Returns(projProperties.Object);
-            projectTarget.SetupGet(s => s.ProjectItems).Returns(projectItemsTarget.Object);
-            projectTarget.SetupGet(s => s.FullName).Returns(@"c:\myproject\my.console\my.console.csproj");
-            var configurationManager = new Mock<ConfigurationManager>();
-            configurationManager.SetupGet(s => s.ConfigurationRowNames).Returns(ConfigNames);
-            projectTarget.SetupGet(s => s.ConfigurationManager).Returns(configurationManager.Object);
-            return projectTarget;
-        }
-
-        private static Mock<TEnumerable> CreateEnumerableMock<TEnumerable, TItem>(params TItem[] items)
-            where TEnumerable : class, IEnumerable
-            where TItem : class
-        {
-            var enumerableMock = new Mock<TEnumerable>();
-            var enumerableInterface = enumerableMock.As<IEnumerable>();
-            enumerableInterface.Setup(s => s.GetEnumerator()).Returns(() => items.Where(w=>w != null).GetEnumerator());
-
-            return enumerableMock;
-        }
-
-        private static Mock<TEnumerable> CreateEnumerableMock<TEnumerable, TItem>()
-            where TEnumerable : class, IEnumerable
-            where TItem : class
-        {
-            var enumerableMock = CreateEnumerableMock<TEnumerable, TItem>(new TItem[] {});
-
-            return enumerableMock;
-        }
-
-        private static Mock<Property> CreatePropertyMock(string name, object value)
-        {
-            var property = new Mock<Property>();
-            property.SetupGet(s => s.Name).Returns(name);
-            property.SetupGet(s => s.Value).Returns(value);
-
-            return property;
-        }
     }
 
 }

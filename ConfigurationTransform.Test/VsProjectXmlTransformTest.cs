@@ -87,6 +87,22 @@ namespace ConfigurationTransform.Test
         }
 
         [TestMethod]
+        public void HasAfterBuildTarget_Returns_True()
+        {
+            //Arrange
+            var target = new Mock<VsProjectXmlTransformMock>(){ CallBase = true};
+            target.Protected().Setup<XElement>("LoadProjectFile").Returns(ProjectWithoutLinkFiles);
+            target.Object.Open("");
+            const string condition = @"Exists('log.$(Configuration).config')";
+
+            //Act
+            var actual = target.Object.HasAfterBuildTarget(condition);
+
+            //Assert
+            Assert.AreEqual(true, actual);
+        }
+
+        [TestMethod]
         public void HasDependentUponConfig_Returns_True()
         {
             //Arrange
@@ -163,6 +179,11 @@ namespace ConfigurationTransform.Test
         public bool HasAfterCompileTarget(string condition)
         {
             return base.HasAfterCompileTarget(condition);
+        }
+
+        public bool HasAfterBuildTarget(string condition)
+        {
+            return base.HasAfterBuildTarget(condition);
         }
 
         public bool HasAfterPublishTarget()
