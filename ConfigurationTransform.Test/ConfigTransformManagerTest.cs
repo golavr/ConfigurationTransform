@@ -206,8 +206,6 @@ namespace ConfigurationTransform.Test
             //Assert
             solutionTestHelper.AppConfigProjectItemChildsMock.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.debug.config"));
             solutionTestHelper.AppConfigProjectItemChildsMock.Verify(v => v.AddFromFile(@"c:\myproject\my.common\app.release.config"));
-
-            solutionTestHelper.ProjectTargetMock.Verify(v=>v.Save(""));
         }
 
         [TestMethod]
@@ -227,8 +225,6 @@ namespace ConfigurationTransform.Test
             //Assert
             solutionTestHelper.AnyConfigProjectItemChildsMock.Verify(v => v.AddFromFile(@"c:\myproject\my.common\any.debug.config"));
             solutionTestHelper.AnyConfigProjectItemChildsMock.Verify(v => v.AddFromFile(@"c:\myproject\my.common\any.release.config"));
-
-            solutionTestHelper.ProjectTargetMock.Verify(v=>v.Save(""));
         }
 
         [TestMethod]
@@ -253,6 +249,7 @@ namespace ConfigurationTransform.Test
             var isSaved = ConfigTransformManager.EditProjectFile(solutionTestHelper.AppConfigProjectItemMock.Object);
 
             //Assert
+            solutionTestHelper.ProjectTargetMock.Verify(v => v.Save(It.IsAny<string>()));
             projectXml.Verify(v => v.AddTransformTask());
             projectXml.Verify(v => v.AddAfterCompileTarget(RootAppConfig, @"..\my.common", true));
             projectXml.Verify(v => v.AddAfterPublishTarget());
@@ -281,6 +278,7 @@ namespace ConfigurationTransform.Test
             var isSaved = ConfigTransformManager.EditProjectFile(solutionTestHelper.AnyConfigProjectItemMock.Object);
 
             //Assert
+            solutionTestHelper.ProjectTargetMock.Verify(v=>v.Save(It.IsAny<string>()));
             projectXml.Verify(v => v.AddTransformTask());
             projectXml.Verify(v => v.AddAfterBuildTarget(RootAnyConfig, @"..\my.common", true));
             projectXml.Verify(v => v.Save());

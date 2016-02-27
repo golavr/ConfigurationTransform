@@ -39,6 +39,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             StreamManager = new StreamManager();
         }
 
+        //TODO:[Golan] - break this method to small pieces
         public static bool EditProjectFile(ProjectItem projectItem)
         {
             string relativePrefix = null;
@@ -81,6 +82,11 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                     CreateConfigFiles(project, projectItem);
                 }
 
+                // we need to know if we saved the file when displaying message to user
+                var changed = project.IsDirty;
+                // save before making external changes to file
+                if (changed) project.Save();
+
                 // project file(e.g. c:\myproject\myproject.csproj)
                 var fileName = project.FullName;
                 // config name (e.g. app.config or logging.config)
@@ -101,13 +107,12 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
                 // save project file
                 var isSaved = ProjectXmlTransform.Save();
-                // check if need to reload project
+                // check if need to reload project, remember that we edit the project file externally
                 if (isSaved)
                 {
                     project.SaveReloadProject();
-                    //ReloadProject(project);
                 }
-                return isSaved;
+                return changed || isSaved;
             }
             finally
             {
@@ -131,11 +136,6 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
                 CreateLikedConfigFilesFromProject(targetProjectItem, sourceRootConfig);
             }
-
-            // get item containing project
-            var targetProject = targetProjectItem.ContainingProject;
-            // save target project file
-            if (targetProject.IsDirty) targetProject.Save();
         }
 
         private static void CreateLikedConfigFilesFromProject(ProjectItem targetProjectItem, ProjectItem sourceRootConfig)
@@ -212,11 +212,6 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                     projectItem.ProjectItems.AddFromFile(dependentConfigFullPath);
                     //project.ProjectItems.AddFromFile(dependentConfigFullPath);
                 }
-            }
-            // save project file in case we changed it
-            if (projectFileIsDirty)
-            {
-                project.Save();
             }
         }
 
