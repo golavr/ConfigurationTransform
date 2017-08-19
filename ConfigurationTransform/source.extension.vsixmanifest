@@ -1,48 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
-  <Identifier Id="c347e8c1-66cb-475a-8eb4-a5a2018452fc">
-    <Name>Configuration Transform</Name>
-    <Author>Golan Avraham</Author>
-    <Version>3.0</Version>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="c347e8c1-66cb-475a-8eb4-a5a2018452fc" Version="3.1" Language="en-US" Publisher="Golan Avraham" />
+    <DisplayName>Configuration Transform</DisplayName>
     <Description xml:space="preserve">Automatically transform app.config or any other config during build process. Once the transformation is set, it will run on other build machines without the extension.</Description>
-    <Locale>1033</Locale>
+    <MoreInfo>http://visualstudiogallery.msdn.microsoft.com/579d3a78-3bdd-497c-bc21-aa6e6abbc859</MoreInfo>
     <License>license.txt</License>
     <Icon>package_icon.png</Icon>
     <PreviewImage>package_preview.png</PreviewImage>
-    <InstalledByMsi>false</InstalledByMsi>
-    <MoreInfoUrl>http://visualstudiogallery.msdn.microsoft.com/579d3a78-3bdd-497c-bc21-aa6e6abbc859</MoreInfoUrl>
-    <SupportedProducts>
-      <VisualStudio Version="10.0">
-        <Edition>Ultimate</Edition>
-        <Edition>Premium</Edition>
-        <Edition>Pro</Edition>
-      </VisualStudio>
-      <VisualStudio Version="11.0">
-        <Edition>Ultimate</Edition>
-        <Edition>Premium</Edition>
-        <Edition>Pro</Edition>
-        <Edition>IntegratedShell</Edition>
-        <Edition>VST_All</Edition>
-      </VisualStudio>
-      <VisualStudio Version="12.0">
-        <Edition>Ultimate</Edition>
-        <Edition>Premium</Edition>
-        <Edition>Pro</Edition>
-      </VisualStudio>      
-      <VisualStudio Version="14.0">
-        <Edition>Ultimate</Edition>
-        <Edition>Premium</Edition>
-        <Edition>Pro</Edition>
-      </VisualStudio>
-    </SupportedProducts>
-    <SupportedFrameworkRuntimeEdition MinVersion="4.0" />
-  </Identifier>
-  <References>
-    <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
-      <Name>Visual Studio MPF</Name>
-    </Reference>
-  </References>
-  <Content>
-    <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
-  </Content>
-</Vsix>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[11.0,15.0]" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+  </Assets>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
+</PackageManifest>
