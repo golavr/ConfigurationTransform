@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using EnvDTE;
 using GolanAvraham.ConfigurationTransform.Services;
@@ -17,6 +18,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         private const string DependencyConfigContent =
 @"<?xml version=""1.0""?>
 <!-- For more information on using app.config transformation visit http://go.microsoft.com/fwlink/?LinkId=125889 -->
+<!-- In case configuration is not the root element, replace it with root element in source configuration file -->
 <configuration xmlns:xdt=""http://schemas.microsoft.com/XML-Document-Transform"">
 </configuration>";
 
@@ -34,7 +36,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         {
             // add default vs service
             VsService = VsServices.Instance;
-            ProjectXmlTransform = new VsProjectXmlTransform();
+            ProjectXmlTransform = new VsProjectXmlTransform(VsService);
             FileWrapper = new FileWrapper();
             StreamManager = new StreamManager();
         }
@@ -58,7 +60,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 // check if its linked config
                 if (isLinkAppConfig)
                 {
-                    // display yes/no message to user. yes - add as lined configs; no - add as concrete configs
+                    // display yes/no message to user. yes - add as linked configs; no - add as concrete configs
                     var result = VsService.ShowMessageBox("Add as linked configs?",
                                                           OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
                                                           OLEMSGICON.OLEMSGICON_QUERY);
@@ -73,11 +75,13 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
                 if (createAsLinkedConfig)
                 {
+                    VsService.OutputLine("Add LinkedConfigFiles");
                     // since it's link files we only need to copy them as like files to project
                     CreateLinkedConfigFiles(projectItem);
                 }
                 else
                 {
+                    VsService.OutputLine("Add ConfigFiles");
                     // create missing config files
                     CreateConfigFiles(project, projectItem);
                 }
@@ -93,24 +97,35 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 var configName = projectItem.Name;
 
                 ProjectXmlTransform.Open(fileName);
+                VsService.OutputLine("Add UsingTask");
                 ProjectXmlTransform.AddTransformTask();
                 if (IsRootAppConfig(configName))
                 {
+                    VsService.OutputLine("Add AfterCompileTarget");
                     ProjectXmlTransform.AddAfterCompileTarget(configName, relativePrefix, createAsLinkedConfig);
+                    VsService.OutputLine("Add AfterPublishTarget");
                     // project is a windows application or console application? if so add click once transform task
-                    ProjectXmlTransform.AddAfterPublishTarget();
+                    ProjectXmlTransform.AddAfterPublishTarget(configName, relativePrefix, createAsLinkedConfig);
                 }
                 else
                 {
+                    VsService.OutputLine("Add AfterBuildTarget");
                     ProjectXmlTransform.AddAfterBuildTarget(configName, relativePrefix, createAsLinkedConfig);
                 }
 
+                VsService.OutputLine("Check if need to save project file");
                 // save project file
                 var isSaved = ProjectXmlTransform.Save();
                 // check if need to reload project, remember that we edit the project file externally
                 if (isSaved)
                 {
+                    VsService.OutputLine("Done saving project file");
+                    VsService.OutputLine("Reloading project file");
                     project.SaveReloadProject();
+                }
+                else
+                {
+                    VsService.OutputLine("No changes made in project file");
                 }
                 return changed || isSaved;
             }
@@ -125,7 +140,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             // get source root config project item
             var sourceRootConfig = targetProjectItem.GetProjectItemContainingFullPath();
 
-            // sorce config is not included in project
+            // source config is not included in project
             if (sourceRootConfig == null)
             {
                 CreateLikedConfigFilesNotFromProject(targetProjectItem);
@@ -182,12 +197,10 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         // so no dependent transformed config under linked app.config in designer
         private static void CreateConfigFiles(Project project, ProjectItem projectItem)
         {
-            string appConfigName = projectItem.Name;
+            var appConfigName = projectItem.Name;
             var buildConfigurationNames = project.GetBuildConfigurationNames();
-            var projectFileIsDirty = false;
             // get app.config directory. new transform config will be created there.
-            //var path = projectItem.GetFullPath();
-            string path = null;
+            string path;
             if (projectItem.IsLink())
             {
                 path = Directory.GetParent(projectItem.ContainingProject.FullName).FullName;
@@ -202,16 +215,18 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 var dependentConfig = GetTransformConfigName(appConfigName, buildConfigurationName);
                 var dependentConfigFullPath = Path.Combine(path, dependentConfig);
                 // check if config file exist
-                if (!FileWrapper.Exists(dependentConfigFullPath))
+                if (FileWrapper.Exists(dependentConfigFullPath))
                 {
-                    using (var file = FileWrapper.AppendText(dependentConfigFullPath))
-                    {
-                        file.Write(DependencyConfigContent);
-                    }
-                    projectFileIsDirty = true;
-                    projectItem.ProjectItems.AddFromFile(dependentConfigFullPath);
-                    //project.ProjectItems.AddFromFile(dependentConfigFullPath);
+                    VsService.OutputLine($"File {dependentConfig} already exists");
+                    continue;
                 }
+
+                using (var file = FileWrapper.AppendText(dependentConfigFullPath))
+                {
+                    file.Write(DependencyConfigContent);
+                }
+                projectItem.ProjectItems.AddFromFile(dependentConfigFullPath);
+                VsService.OutputLine($"File {dependentConfig} was added");
             }
         }
 
@@ -219,8 +234,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         {
             var configSplit = sourceConfigName.Split('.');
             if (configSplit.Length < 2) throw new NotSupportedException(sourceConfigName);
-            var dependentConfig = string.Format("{0}.{1}.{2}", configSplit[0], buildConfigurationName,
-                                                    configSplit[1]);
+            var dependentConfig = $"{configSplit[0]}.{buildConfigurationName}.{configSplit[1]}";
             return dependentConfig;
         }
 
@@ -272,13 +286,15 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 transformableDocument.Load(sourceFile);
                 return transformableDocument;
             }
-            catch (XmlException ex)
+            //catch (XmlException ex)
+            //{
+            //    VsService.OutputLine($"Failed to open {sourceFile}");
+            //    throw;
+            //}
+            catch (Exception e)
             {
+                VsService.OutputLine($"Failed to open {sourceFile}");
                 throw;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception();
             }
         }
 
@@ -309,7 +325,7 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
         private static void WriteToFile(string tempFilePath, string stringToWrite)
         {
-            using (var file = StreamManager.NewStreamWriter(tempFilePath, false))
+            using (var file = StreamManager.NewStreamWriter(tempFilePath, false, Encoding.UTF8))
             {
                 file.Write(stringToWrite);
             }

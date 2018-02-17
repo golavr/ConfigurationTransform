@@ -252,7 +252,7 @@ namespace ConfigurationTransform.Test
             solutionTestHelper.ProjectTargetMock.Verify(v => v.Save(It.IsAny<string>()));
             projectXml.Verify(v => v.AddTransformTask());
             projectXml.Verify(v => v.AddAfterCompileTarget(RootAppConfig, @"..\my.common", true));
-            projectXml.Verify(v => v.AddAfterPublishTarget());
+            projectXml.Verify(v => v.AddAfterPublishTarget(RootAppConfig, @"..\my.common", true));
             projectXml.Verify(v => v.Save());
         }
 

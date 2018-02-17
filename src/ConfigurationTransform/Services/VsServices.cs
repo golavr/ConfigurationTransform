@@ -15,10 +15,7 @@ namespace GolanAvraham.ConfigurationTransform.Services
     {
         private static readonly VsServices _instance = new VsServices();
 
-        public static VsServices Instance
-        {
-            get { return _instance; }
-        }
+        public static VsServices Instance => _instance;
 
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
@@ -28,6 +25,21 @@ namespace GolanAvraham.ConfigurationTransform.Services
 
         protected VsServices()
         {
+        }
+
+        public void OutputLine(string message)
+        {
+            // Get the output window
+            var outputWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+
+            // Ensure that the desired pane is visible
+            var paneGuid = VSConstants.OutputWindowPaneGuid.GeneralPane_guid;
+            IVsOutputWindowPane pane;
+            outputWindow.CreatePane(paneGuid, "ConfigurationTransform", 1, 0);
+            outputWindow.GetPane(paneGuid, out pane);
+
+            // Output the message
+            pane.OutputString($"{message}{Environment.NewLine}");
         }
 
         public int ShowMessageBox(string title, string message, OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGICON icon = OLEMSGICON.OLEMSGICON_INFO)
@@ -53,8 +65,8 @@ namespace GolanAvraham.ConfigurationTransform.Services
         public IVsWindowFrame OpenComparisonWindow2(string leftFileMoniker, string rightFileMoniker, string caption, string tooltip, string leftLabel, string rightLabel, string inlineLabel, string roles, uint grfDiffOptions)
         {
             // get diff service
-            var diffService = Package.GetGlobalService(typeof(SVsDifferenceService)) as IVsDifferenceService;
-            if (diffService == null) throw new NotSupportedException("IVsDifferenceService");
+            if (!(Package.GetGlobalService(typeof(SVsDifferenceService)) is IVsDifferenceService diffService))
+                throw new NotSupportedException("IVsDifferenceService");
 
             var windowFrame = diffService.OpenComparisonWindow2(leftFileMoniker, rightFileMoniker, caption, tooltip, leftLabel, rightLabel,
                 inlineLabel, roles, grfDiffOptions);
@@ -76,8 +88,8 @@ namespace GolanAvraham.ConfigurationTransform.Services
         public virtual IVsWindowFrame OpenComparisonWindow(string leftFile, string rightFile,
             string leftLabel, string rightLabel)
         {
-            var caption = string.Format("{0} vs. {1}", rightLabel, leftLabel);
-            var tooltip = string.Format("Diff - {0}", rightLabel);
+            var caption = $"{rightLabel} vs. {leftLabel}";
+            var tooltip = $"Diff - {rightLabel}";
             var windowFrame = OpenComparisonWindow(leftFile, rightFile, caption, tooltip, leftLabel, rightLabel);
 
             return windowFrame;
@@ -87,6 +99,7 @@ namespace GolanAvraham.ConfigurationTransform.Services
         {
             // first try to compare
             if (CompareFilesDeleteOnClose(leftFile, rightFile, leftLabel, rightLabel)) return;
+            OutputLine("Open transformed file as fallback solution");
             // fallback call for document open
             var dte2 = DTEExtensions.GetInstance();
             OpenFileDeleteOnClose(rightFile, dte2);
@@ -105,37 +118,43 @@ namespace GolanAvraham.ConfigurationTransform.Services
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine(string.Format("Cannot register for file delete. File: {0}. Exception message: {1}",
-                        rightFile, e.Message));
+                    var message = $"Cannot register for file delete. File: {rightFile}. Exception message: {e.Message}";
+                    Trace.WriteLine(message);
+                    OutputLine(message);
                 }
                 return true;
             }
             catch (Exception e)
             {
-                Trace.WriteLine(string.Format("Cannot open diff within visual studio. Exception message: {0}", e.Message));
+                var message = $"Cannot open diff within visual studio. Exception message: {e.Message}";
+                Trace.WriteLine(message);
+                OutputLine(message);
             }
             return false;
         }
 
-        private static bool OpenFileDeleteOnClose(string rightFile, DTE dte2)
+        private bool OpenFileDeleteOnClose(string path, DTE dte2)
         {
             try
             {
-                dte2.Documents.Open(rightFile, "Auto", true);
+                dte2.Documents.Open(path, "Auto", true);
                 try
                 {
-                    VsServicesExtensions.TryRegisterCloseAndDeleteFile(rightFile);
+                    path.TryRegisterCloseAndDeleteFile();
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine(string.Format("Cannot register for file delete. File: {0}. Exception message: {1}", rightFile,
-                        e.Message));
+                    var message = $"Cannot register for file delete. File: {path}. Exception message: {e.Message}";
+                    Trace.WriteLine(message);
+                    OutputLine(message);
                 }
                 return true;
             }
             catch (Exception e)
             {
-                Trace.WriteLine(string.Format("Cannot open file within visual studio. Exception message: {0}", e.Message));
+                var message = $"Cannot open file within visual studio. Exception message: {e.Message}";
+                Trace.WriteLine(message);
+                OutputLine(message);
             }
             return false;
         }

@@ -113,6 +113,7 @@ namespace GolanAvraham.ConfigurationTransform
                 Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
                     "Exception in PreviewBeforeQueryStatus() of: {0}. Exception message: {1}", this,
                     e.Message));
+                VsServices.Instance.OutputLine(e.Message);
             }
         }
 
@@ -121,11 +122,12 @@ namespace GolanAvraham.ConfigurationTransform
             try
             {
                 ConfigTransformManager.PreviewTransform(_selectedProjectItem);
-  }
+            }
             catch (Exception e)
             {
                 Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
                     "Exception in PreviewMenuItemCallback() of: {0}. Exception message: {1}", this, e.Message));
+                VsServices.Instance.OutputLine(e.Message);
             }
         }
 
@@ -143,6 +145,7 @@ namespace GolanAvraham.ConfigurationTransform
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
+                if (_selectedProjectItem == null) return;
                 if (ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name))
                 {
                     menuCommand.Visible = true;
@@ -156,6 +159,7 @@ namespace GolanAvraham.ConfigurationTransform
             {
                 Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
                     "Exception in BeforeQueryStatus() of: {0}. Exception message: {1}", this, e.Message));
+                VsServices.Instance.OutputLine(e.Message);
             }
         }
 
@@ -166,11 +170,15 @@ namespace GolanAvraham.ConfigurationTransform
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
+            var configName = _selectedProjectItem.Name;
+            VsServices.Instance.OutputLine($"------ Transform started for {configName}");
+
             var editProjectFile = ConfigTransformManager.EditProjectFile(_selectedProjectItem);
             const string reloadMessage = @"Changes were made in project file.";
             const string noChangeMessage = @"No changes were made.";
             var displayMessage = editProjectFile ? reloadMessage : noChangeMessage;
 
+            VsServices.Instance.OutputLine($"------ Transform ended for {configName}");
             // Show a Message Box
             VsServices.Instance.ShowMessageBox(displayMessage);
         }

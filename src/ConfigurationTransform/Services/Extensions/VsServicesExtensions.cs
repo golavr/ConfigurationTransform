@@ -26,8 +26,7 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
                 if (vsWindowFrame == null) return false;
                 // register to window event, delete file when window close
                 var deleteFileOnWindowFrameClose = deleteHandler ?? new DeleteFileOnWindowFrameClose(path);
-                uint cookie;
-                vsWindowFrame.Advise(deleteFileOnWindowFrameClose, out cookie);
+                vsWindowFrame.Advise(deleteFileOnWindowFrameClose, out _);
             }
             catch (Exception e)
             {
@@ -35,12 +34,13 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             }
             return true;
         }
-        public static bool TryRegisterCloseAndDeleteFile(string path)
+
+        public static bool TryRegisterCloseAndDeleteFile(this string path)
         {
             try
             {
                 var dte2 = DTEExtensions.GetInstance();
-                var deleteFileOnDocumentClose = new DeleteFileOnDocumentClose(path, dte2.Events.DocumentEvents);
+                DeleteFileOnDocumentClose.Register(path, dte2.Events.DocumentEvents);
             }
             catch (Exception e)
             {
