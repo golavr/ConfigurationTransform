@@ -101,7 +101,7 @@ namespace GolanAvraham.ConfigurationTransform
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
-                if (!ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name)) return;
+                //if (!ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name)) return;
 
                 menuCommand.Visible = true;
             }
@@ -145,7 +145,7 @@ namespace GolanAvraham.ConfigurationTransform
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
                 if (_selectedProjectItem == null) return;
-                if (!ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name)) return;
+                //if (!ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name)) return;
 
                 menuCommand.Visible = true;
             }

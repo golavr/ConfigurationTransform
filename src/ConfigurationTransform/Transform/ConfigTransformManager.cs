@@ -218,15 +218,17 @@ namespace GolanAvraham.ConfigurationTransform.Transform
                 if (FileWrapper.Exists(dependentConfigFullPath))
                 {
                     VsService.OutputLine($"File {dependentConfig} already exists");
-                    continue;
                 }
-
-                using (var file = FileWrapper.AppendText(dependentConfigFullPath))
+                else
                 {
-                    file.Write(DependencyConfigContent);
+                    using (var file = FileWrapper.AppendText(dependentConfigFullPath))
+                    {
+                        file.Write(DependencyConfigContent);
+                    }
+                    VsService.OutputLine($"File {dependentConfig} was added");
                 }
+                // add it to project file anyway, in case it was deleted just from project file 
                 projectItem.ProjectItems.AddFromFile(dependentConfigFullPath);
-                VsService.OutputLine($"File {dependentConfig} was added");
             }
         }
 
