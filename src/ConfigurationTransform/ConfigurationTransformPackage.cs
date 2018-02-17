@@ -94,19 +94,16 @@ namespace GolanAvraham.ConfigurationTransform
             {
                 var menuCommand = sender as OleMenuCommand;
                 if (menuCommand == null) return;
+                menuCommand.Visible = false;
 
                 var dte2 = DTEExtensions.GetInstance();
+                if (!dte2.HasOneSelectedItem()) return;
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
-                if (ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name))
-                {
-                    menuCommand.Visible = true;
-                }
-                else
-                {
-                    menuCommand.Visible = false;
-                }
+                if (!ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name)) return;
+
+                menuCommand.Visible = true;
             }
             catch (Exception e)
             {
@@ -140,20 +137,17 @@ namespace GolanAvraham.ConfigurationTransform
             {
                 var menuCommand = sender as OleMenuCommand;
                 if (menuCommand == null) return;
+                menuCommand.Visible = false;
 
                 var dte2 = DTEExtensions.GetInstance();
+                if (!dte2.HasOneSelectedItem()) return;
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
                 if (_selectedProjectItem == null) return;
-                if (ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name))
-                {
-                    menuCommand.Visible = true;
-                }
-                else
-                {
-                    menuCommand.Visible = false;
-                }
+                if (!ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name)) return;
+
+                menuCommand.Visible = true;
             }
             catch (Exception e)
             {

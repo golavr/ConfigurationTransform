@@ -18,6 +18,11 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             return dte.SelectedItems.AsEnumerable().Single();
         }
 
+        public static bool HasOneSelectedItem(this DTE dte)
+        {
+            return dte.SelectedItems.Count == 1;
+        }
+
         public static Project FindProjectByProjectItemProperties(this DTE dte,
                                                                  Predicate<IEnumerable<Property>> predicate)
         {
