@@ -1,24 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-  <Metadata>
-    <Identity Id="c347e8c1-66cb-475a-8eb4-a5a2018452fc" Version="3.1" Language="en-US" Publisher="Golan Avraham" />
-    <DisplayName>Configuration Transform</DisplayName>
-    <Description xml:space="preserve">Automatically transform app.config or any other config during build process. Once the transformation is set, it will run on other build machines without the extension.</Description>
-    <MoreInfo>http://visualstudiogallery.msdn.microsoft.com/579d3a78-3bdd-497c-bc21-aa6e6abbc859</MoreInfo>
-    <License>license.txt</License>
-    <Icon>package_icon.png</Icon>
-    <PreviewImage>package_preview.png</PreviewImage>
-  </Metadata>
-  <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[11.0,15.0]" />
-  </Installation>
-  <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-  </Dependencies>
-  <Assets>
-    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-  </Assets>
-  <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
-  </Prerequisites>
+    <Metadata>
+        <Identity Id="c347e8c1-66cb-475a-8eb4-a5a2018452fc" Version="3.2" Language="en-US" Publisher="Golan Avraham" />
+        <DisplayName>Configuration Transform</DisplayName>
+        <Description xml:space="preserve">Automatically transform app.config or any other config during build process. Once the transformation is set, it will run on other build machines without the extension.</Description>
+        <MoreInfo>https://marketplace.visualstudio.com/items?itemName=GolanAvraham.ConfigurationTransform</MoreInfo>
+        <License>license.txt</License>
+        <ReleaseNotes>https://github.com/golavr/ConfigurationTransform/wiki/v3.2-Release-Notes</ReleaseNotes>
+        <Icon>package_icon.png</Icon>
+        <PreviewImage>package_preview.png</PreviewImage>
+        <Tags>app.config;Build;Configuration;diff;Team Development;Transform;XDT</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[11.0,15.0]" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
 </PackageManifest>

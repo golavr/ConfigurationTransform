@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using EnvDTE;
+using GolanAvraham.ConfigurationTransform.Remove;
 using GolanAvraham.ConfigurationTransform.Services;
 using GolanAvraham.ConfigurationTransform.Transform;
 using Microsoft.VisualStudio;
@@ -78,6 +79,9 @@ namespace GolanAvraham.ConfigurationTransform
                 var previewCommandId = new CommandID(GuidList.guidConfigurationTransformCmdSet, (int)PkgCmdIDList.cmdidPreviewConfigTransforms);
                 var previewOleMenuCommand = new OleMenuCommand(PreviewMenuItemCallback, null, PreviewBeforeQueryStatus, previewCommandId);
                 mcs.AddCommand(previewOleMenuCommand);
+
+                // Remove
+                RemoveCommand.Create(this, GuidList.ProjectMenuGroupCmdSet, (int) PkgCmdIDList.RemoveCommandId);
             }
         }
 
@@ -94,25 +98,23 @@ namespace GolanAvraham.ConfigurationTransform
             {
                 var menuCommand = sender as OleMenuCommand;
                 if (menuCommand == null) return;
+                menuCommand.Visible = false;
 
                 var dte2 = DTEExtensions.GetInstance();
+                if (!dte2.HasOneSelectedItem()) return;
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
-                if (ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name))
-                {
-                    menuCommand.Visible = true;
-                }
-                else
-                {
-                    menuCommand.Visible = false;
-                }
+                //if (!ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name)) return;
+
+                menuCommand.Visible = true;
             }
             catch (Exception e)
             {
                 Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
                     "Exception in PreviewBeforeQueryStatus() of: {0}. Exception message: {1}", this,
                     e.Message));
+                VsServices.Instance.OutputLine(e.Message);
             }
         }
 
@@ -121,11 +123,12 @@ namespace GolanAvraham.ConfigurationTransform
             try
             {
                 ConfigTransformManager.PreviewTransform(_selectedProjectItem);
-  }
+            }
             catch (Exception e)
             {
                 Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
                     "Exception in PreviewMenuItemCallback() of: {0}. Exception message: {1}", this, e.Message));
+                VsServices.Instance.OutputLine(e.Message);
             }
         }
 
@@ -138,24 +141,23 @@ namespace GolanAvraham.ConfigurationTransform
             {
                 var menuCommand = sender as OleMenuCommand;
                 if (menuCommand == null) return;
+                menuCommand.Visible = false;
 
                 var dte2 = DTEExtensions.GetInstance();
+                if (!dte2.HasOneSelectedItem()) return;
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
-                if (ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name))
-                {
-                    menuCommand.Visible = true;
-                }
-                else
-                {
-                    menuCommand.Visible = false;
-                }
+                if (_selectedProjectItem == null) return;
+                //if (!ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name)) return;
+
+                menuCommand.Visible = true;
             }
             catch (Exception e)
             {
                 Trace.WriteLine(string.Format(CultureInfo.CurrentCulture,
                     "Exception in BeforeQueryStatus() of: {0}. Exception message: {1}", this, e.Message));
+                VsServices.Instance.OutputLine(e.Message);
             }
         }
 
@@ -166,11 +168,15 @@ namespace GolanAvraham.ConfigurationTransform
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
+            var configName = _selectedProjectItem.Name;
+            VsServices.Instance.OutputLine($"------ Transform started for {configName}");
+
             var editProjectFile = ConfigTransformManager.EditProjectFile(_selectedProjectItem);
             const string reloadMessage = @"Changes were made in project file.";
             const string noChangeMessage = @"No changes were made.";
             var displayMessage = editProjectFile ? reloadMessage : noChangeMessage;
 
+            VsServices.Instance.OutputLine($"------ Transform ended for {configName}");
             // Show a Message Box
             VsServices.Instance.ShowMessageBox(displayMessage);
         }

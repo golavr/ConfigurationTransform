@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
 using System.Linq;
 using System.Xml.Linq;
+using GolanAvraham.ConfigurationTransform.Services;
 
 namespace GolanAvraham.ConfigurationTransform.Transform
 {
@@ -11,27 +10,27 @@ namespace GolanAvraham.ConfigurationTransform.Transform
     {
         void Open(string fileName);
         bool Save();
-        void AddDependentUponConfig(string buildConfigurationName, string appConfigName);
-        void AddDependentUponConfig(string[] buildConfigurationNames, string appConfigName);
         void AddTransformTask();
         void AddAfterCompileTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false);
-        void AddAfterBuildTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false);
-        void AddAfterPublishTarget();
+        void AddAfterPublishTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false);
+        void AddAfterBuildTarget(string anyConfigName, string relativePrefix = null, bool transformConfigIsLink = false);
     }
 
     public class VsProjectXmlTransform : IVsProjectXmlTransform
     {
+        private readonly IVsServices _vsServices;
         private string _fileName;
         private XElement _projectRoot;
         private bool _isDirty;
 
         private static readonly XNamespace Namespace = "http://schemas.microsoft.com/developer/msbuild/2003";
+        private readonly XmlTransform _xmlTransform;
 
-        private const string DeployedConfig =
-            @"$(_DeploymentApplicationDir)$(TargetName)$(TargetExt).config$(_DeploymentFileMappingExtension)";
-
-        private const string TransformAssemblyFile =
-            @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll";
+        public VsProjectXmlTransform(IVsServices vsServices)
+        {
+            _vsServices = vsServices;
+            _xmlTransform = new XmlTransform();
+        }
 
         public virtual void Open(string fileName)
         {
@@ -40,21 +39,9 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             _projectRoot = LoadProjectFile();
         }
 
-        //public VsProjectXmlTransform(string fileName)
-        //{
-        //    _fileName = fileName;
-
-        //    _projectRoot = LoadProjectFile();
-        //}
-
         protected virtual XElement LoadProjectFile()
         {
-            return XElement.Load(_fileName);
-        }
-
-        private XElement CreateElement(string name, params object[] content)
-        {
-            return new XElement(Namespace + name, content);
+            return XElement.Load(_fileName, LoadOptions.SetLineInfo);
         }
 
         public bool Save()
@@ -64,138 +51,116 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             return true;
         }
 
-        public void AddDependentUponConfig(string buildConfigurationName, string appConfigName)
-        {
-            AddDependentUponConfig(new[] { buildConfigurationName }, appConfigName);
-        }
-
-        public void AddDependentUponConfig(string[] buildConfigurationNames, string appConfigName)
-        {
-            // get list of configs to add
-            var missingDependentUponConfigs = GetMissingDependentUponConfigs(buildConfigurationNames, appConfigName);
-            // nothing to add?
-            if (missingDependentUponConfigs == null || !missingDependentUponConfigs.Any()) return;
-            _isDirty = true;
-
-            var pureMissing = new List<string>();
-            foreach (var dependentUponConfig in missingDependentUponConfigs)
-            {
-                XElement includeElement;
-                // try to get include node without dependent upon
-                if (TryGetIncludeConfigElement(dependentUponConfig, out includeElement))
-                {
-                    // included but haven't got dependent upon, so add one
-                    includeElement.Add(CreateElement("DependentUpon", appConfigName));
-                }
-                else
-                {
-                    // not included
-                    pureMissing.Add(dependentUponConfig);
-                }
-            }
-            if (!pureMissing.Any()) return;
-
-            AddConfigsToExistingItemGroupOrCreateNewOne(appConfigName, pureMissing);
-        }
-
-        protected virtual void AddConfigsToExistingItemGroupOrCreateNewOne(string appConfigName, IEnumerable<string> pureMissing)
-        {
-            XElement mainAppConfigElement;
-            // try to find main app config (e.g. App.config)
-            if (TryGetIncludeConfigElement(appConfigName, out mainAppConfigElement))
-            {
-                mainAppConfigElement.AddAfterSelf(
-                    pureMissing.Select(
-                        s => CreateIncludeWithDependentElement(s, appConfigName)));
-            }
-            else
-            {
-                var itemGroupNode = CreateElement("ItemGroup",
-                                                  pureMissing.Select(
-                                                      s => CreateIncludeWithDependentElement(s, appConfigName)
-                                                      ));
-                _projectRoot.Add(itemGroupNode);
-            }
-        }
-
-        private XElement CreateIncludeWithDependentElement(string buildConfigName, string appConfigName)
-        {
-            return CreateElement("None", new XAttribute("Include", buildConfigName),
-                                 CreateElement("DependentUpon", appConfigName));
-        }
-
-        protected virtual bool TryGetIncludeConfigElement(string appConfigName, out XElement element)
-        {
-            element =
-                _projectRoot.DescendantsAnyNs("None")
-                            .FirstOrDefault(
-                                none =>
-                                (none.HasAttributes && none.Attributes("Include").Any(include => include.Value == appConfigName)));
-            return element != null;
-        }
-
         public void AddTransformTask()
         {
+            _vsServices.OutputLine("Check if need to create UsingTask");
             // check if already exists
-            if (HasTransformTask()) return;
+            if (_xmlTransform.HasUsingTaskTransformXml(_projectRoot))
+            {
+                _vsServices.OutputLine("UsingTask already exists");
+                return;
+            }
             _isDirty = true;
-
-
-            //var transformAssemblyFile = GetTransformAssemblyFile();
-            var usingTaskNode = CreateElement("UsingTask", new XAttribute("TaskName", "TransformXml"),
-                                             new XAttribute("AssemblyFile", TransformAssemblyFile));
-            _projectRoot.Add(usingTaskNode);
+            _vsServices.OutputLine("Creating UsingTask");
+            var usingTaskTransformXml = _xmlTransform.CreateUsingTaskTransformXml();
+            _projectRoot.Add(usingTaskTransformXml);
+            _vsServices.OutputLine("Done creating UsingTask");
         }
 
         public void AddAfterCompileTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false)
         {
-            var appConfigSplit = appConfigName.Split('.');
-            var configName = appConfigSplit[0];
-            var configExt = appConfigSplit[1];
-
-            if (relativePrefix != null)
+            var targetName = _xmlTransform.GetTargetName(appConfigName, AfterTargets.AfterCompile);
+            _vsServices.OutputLine("Check if need to create AfterCompileTarget");
+            // check if target exists
+            if (_xmlTransform.HasTarget(_projectRoot, targetName))
             {
-                relativePrefix += @"\";
+                _vsServices.OutputLine("AfterCompileTarget already exists");
+                return;
             }
-            // App.$(Configuration).config
-            var configFormat = string.Format(@"{0}{1}.$(Configuration).{2}", relativePrefix, configName, configExt);
-            var transformConfig = configFormat;
-            if (!transformConfigIsLink)
-            {
-                transformConfig = string.Format("{0}.$(Configuration).{1}", configName, configExt);
-            }
-
-            var condition = string.Format("Exists('{0}')", configFormat);
-
-            var appConfigWithPrefix = string.Format(@"{0}{1}", relativePrefix, appConfigName);
-            // check if already exists
-            if (HasAfterCompileTarget(condition)) return;
+            _vsServices.OutputLine("Creating AfterCompileTarget");
+            // target doesn't not exists, so create it
             _isDirty = true;
+            var args = GetTargetTransformArgs(appConfigName, relativePrefix, transformConfigIsLink);
+            var afterCompileTarget = _xmlTransform.CreateTarget(targetName, AfterTargets.AfterCompile, args.Condition);
 
-            var destination = string.Format(@"$(IntermediateOutputPath)$(TargetFileName).{0}", configExt);
-            const string generateComment = @"Generate transformed app config in the intermediate directory";
-            const string forceComment = @"Force build process to use the transformed configuration file from now on.";
-            var targetNod = CreateElement("Target",
-                                         new XAttribute("Name", "AfterCompile"),
-                                         new XAttribute("Condition", condition),
-                                         new XComment(generateComment),
-                                         CreateElement("TransformXml", new XAttribute("Source", appConfigWithPrefix),
-                                                      new XAttribute("Destination", destination),
-                                                      new XAttribute("Transform", transformConfig)),
-                                         new XComment(forceComment),
-                                         CreateElement("ItemGroup",
-                                                      CreateElement("AppConfigWithTargetPath",
-                                                                   new XAttribute("Remove", appConfigName)),
-                                                      CreateElement("AppConfigWithTargetPath",
-                                                                   new XAttribute("Include", destination),
-                                                                   CreateElement("TargetPath", "$(TargetFileName).config")))
-                );
-            _projectRoot.Add(targetNod);
+            var destination = $@"$(IntermediateOutputPath)$(TargetFileName).{args.ConfigExt}";
+
+            // create target content
+            var afterCompileContent = _xmlTransform.CreateAfterCompileContent(
+                args.Source,
+                destination,
+                args.Transform);
+            afterCompileTarget.Add(afterCompileContent);
+
+            // add target to project root
+            _projectRoot.Add(afterCompileTarget);
+            _vsServices.OutputLine("Done creating AfterCompileTarget");
         }
 
-        public void AddAfterBuildTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false)
+        public void AddAfterPublishTarget(string appConfigName, string relativePrefix = null, bool transformConfigIsLink = false)
         {
-            var configSplit = appConfigName.Split('.');
+            var targetName = _xmlTransform.GetTargetName(appConfigName, AfterTargets.AfterPublish);
+            _vsServices.OutputLine("Check if need to create AfterPublishTarget");
+            // check if target exists
+            if (_xmlTransform.HasTarget(_projectRoot, targetName))
+            {
+                _vsServices.OutputLine("AfterPublishTarget already exists");
+                return;
+            }
+            _vsServices.OutputLine("Creating AfterPublishTarget");
+            // target doesn't not exists, so create it
+            _isDirty = true;
+            var condition = GetTargetTransformArgs(appConfigName, relativePrefix, transformConfigIsLink).Condition;
+
+            // create target element
+            var afterPublishTarget = _xmlTransform.CreateTarget(targetName, AfterTargets.AfterPublish, condition);
+
+            // create target content
+            var afterPublishContent = _xmlTransform.CreateAfterPublishContent();
+            afterPublishTarget.Add(afterPublishContent);
+            // add comment to project root
+            _projectRoot.Add(new XComment(@"Override After Publish to support ClickOnce AfterPublish. Target replaces the untransformed config file copied to the deployment directory with the transformed one."));
+            // add target to project root
+            _projectRoot.Add(afterPublishTarget);
+            _vsServices.OutputLine("Done creating AfterPublishTarget");
+        }
+
+        public void AddAfterBuildTarget(string anyConfigName, string relativePrefix = null,
+            bool transformConfigIsLink = false)
+        {
+            var targetName = _xmlTransform.GetTargetName(anyConfigName, AfterTargets.AfterBuild);
+            _vsServices.OutputLine("Check if need to create AfterBuildTarget");
+            // check if target exists
+            if (_xmlTransform.HasTarget(_projectRoot, targetName))
+            {
+                _vsServices.OutputLine("AfterBuildTarget already exists");
+                return;
+            }
+            _vsServices.OutputLine("Creating AfterPublishTarget");
+            // target doesn't not exists, so create it
+            _isDirty = true;
+
+            var args = GetTargetTransformArgs(anyConfigName, relativePrefix, transformConfigIsLink);
+
+            // create target element
+            var afterBuildTarget = _xmlTransform.CreateTarget(targetName, AfterTargets.AfterBuild, args.Condition);
+
+            // create TransformXml element
+            var transformXml = _xmlTransform.CreateTransformXml(
+                args.Source, 
+                args.Destination,
+                args.Transform);
+            afterBuildTarget.Add(transformXml);
+
+            // add target to project root
+            _projectRoot.Add(afterBuildTarget);
+            _vsServices.OutputLine("Done creating AfterPublishTarget");
+        }
+
+        public TargetTransformArgs GetTargetTransformArgs(string anyConfigName, string relativePrefix = null,
+            bool transformConfigIsLink = false)
+        {
+            var configSplit = anyConfigName.Split('.');
             var configName = configSplit[0];
             var configExt = configSplit[1];
 
@@ -203,150 +168,38 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             {
                 relativePrefix += @"\";
             }
-            // logging.$(Configuration).config
-            var configFormat = string.Format(@"{0}{1}.$(Configuration).{2}", relativePrefix, configName, configExt);
-            var transformConfig = configFormat;
-            if (!transformConfigIsLink)
+            string transform;
+
+            if (transformConfigIsLink)
             {
-                transformConfig = string.Format("{0}.$(Configuration).{1}", configName, configExt);
+                // ..\Shared\data.$(Configuration).config
+                transform = $@"{relativePrefix}{configName}.$(Configuration).{configExt}";
+            }
+            else
+            {
+                // data.$(Configuration).config
+                transform = $"{configName}.$(Configuration).{configExt}";
             }
 
-            var condition = string.Format("Exists('{0}')", configFormat);
+            // Exists('..\Shared\data.$(Configuration).config')
+            // Exists('data.$(Configuration).config')
+            var condition = $"Exists('{transform}')";
 
-            var configWithPrefix = string.Format(@"{0}{1}", relativePrefix, appConfigName);
-            // check if already exists
-            if (HasAfterBuildTarget(condition)) return;
-            _isDirty = true;
+            // ..\Shared\data.config
+            var source = $"{relativePrefix}{anyConfigName}";
 
-            var destination = string.Format(@"$(OutputPath){0}.{1}", configName, configExt);
-            const string generateComment = @"Generate transformed config in the output directory";
-            var targetNod = CreateElement("Target",
-                                         new XAttribute("Name", "AfterBuild"),
-                                         new XAttribute("Condition", condition),
-                                         new XComment(generateComment),
-                                         CreateElement("TransformXml", new XAttribute("Source", configWithPrefix),
-                                                      new XAttribute("Destination", destination),
-                                                      new XAttribute("Transform", transformConfig))
-                );
-            _projectRoot.Add(targetNod);
-        }
+            // $(OutputPath)data.config
+            var destination = $@"$(OutputPath){configName}.{configExt}";
 
-        public void AddAfterPublishTarget()
-        {
-            // check if already exists
-            if (HasAfterPublishTarget()) return;
-            _isDirty = true;
-
-            var targetNode = CreateElement("Target",
-                                         new XAttribute("Name", "AfterPublish"),
-                                         CreateElement("PropertyGroup", CreateElement("DeployedConfig", DeployedConfig)),
-                                         new XComment("Publish copies the untransformed App.config to deployment directory so overwrite it"),
-                                         CreateElement("Copy",
-                                             new XAttribute("Condition", "Exists('$(DeployedConfig)')"),
-                                             new XAttribute("SourceFiles", "$(IntermediateOutputPath)$(TargetFileName).config"),
-                                             new XAttribute("DestinationFiles", "$(DeployedConfig)")
-                                             ));
-            _projectRoot.Add(new XComment(@"Override After Publish to support ClickOnce AfterPublish. Target replaces the untransformed config file copied to the deployment directory with the transformed one."));
-            _projectRoot.Add(targetNode);
-        }
-
-        private IEnumerable<string> GetMissingDependentUponConfigs(IEnumerable<string> buildConfigurationNames, string appConfigName, bool isLinkConfig = false)
-        {
-            var missingConfigs = new List<string>();
-            foreach (var buildConfigurationName in buildConfigurationNames)
+            return new TargetTransformArgs
             {
-                string dependentConfig = ConfigTransformManager.GetTransformConfigName(appConfigName, buildConfigurationName);
-
-                var needToAddConfig = isLinkConfig ? !HasDependentUponConfig(dependentConfig) : !HasDependentUponConfigLink(dependentConfig);
-                if (needToAddConfig)
-                {
-                    missingConfigs.Add(dependentConfig);
-                }
-            }
-            return missingConfigs;
+                Condition = condition,
+                ConfigExt = configExt,
+                Destination = destination,
+                Source = source,
+                Transform = transform
+            };
         }
 
-        //TODO:[Golan] - remove all protected methods to new class with public methods
-        protected virtual bool HasDependentUponConfig(string buildConfig)
-        {
-            return
-                _projectRoot.ElementsAnyNs("ItemGroup").Any(
-                    itemGroup => itemGroup.HasElements &&
-                                 itemGroup.ElementsAnyNs("None").Any(
-                                     none => none.HasAttributes &&
-                                             none.Attributes("Include").Any(include => include.Value == buildConfig) &&
-                                             none.HasElements &&
-                                             none.ElementsAnyNs("DependentUpon").Any()));
-        }
-
-        protected virtual bool HasDependentUponConfigLink(string buildConfig)
-        {
-            return
-                _projectRoot.ElementsAnyNs("ItemGroup").Any(
-                    itemGroup => itemGroup.HasElements &&
-                                 itemGroup.ElementsAnyNs("None").Any(
-                                     none => none.HasAttributes &&
-                                             none.Attributes("Include")
-                                                 .Any(include => include.Value.EndsWith(buildConfig)) &&
-                                             none.HasElements &&
-                                             none.ElementsAnyNs("Link").Any(link => link.Value == buildConfig) &&
-                                             none.ElementsAnyNs("DependentUpon").Any()));
-        }
-
-        //protected virtual string GetRootConfigPath(string configName)
-        //{
-        //    var any =
-        //        _projectRoot.ElementsAnyNs("ItemGroup")
-        //                    .Where(
-        //                        itemGroup =>
-        //                        itemGroup.HasElements &&
-        //                        itemGroup.ElementsAnyNs("None")
-        //                                 .Any(
-        //                                     none =>
-        //                                     none.HasAttributes && none.Attributes("Include").Any() && none.HasElements &&
-        //                                     none.ElementsAnyNs("Link").Any(link => link.Value == configName)));
-        //}
-
-        protected virtual bool HasTransformTask()
-        {
-            return
-                _projectRoot.ElementsAnyNs("UsingTask").Any(
-                    usingTask => usingTask.HasAttributes &&
-                         usingTask.Attributes("TaskName").Any(taskName => taskName.Value == "TransformXml"));
-        }
-
-        protected virtual bool HasAfterCompileTarget(string conditionConfig)
-        {
-            return
-                _projectRoot.ElementsAnyNs("Target").Any(
-                    target => target.HasAttributes && target.Attributes("Name").Any(name => name.Value == "AfterCompile") &&
-                         target.Attributes("Condition").Any(condition => condition.Value == conditionConfig) && target.HasElements &&
-                         target.ElementsAnyNs("TransformXml").Any(
-                             transformXml =>
-                             transformXml.HasAttributes && transformXml.Attributes("Source").Any() &&
-                             transformXml.Attributes("Destination").Any() &&
-                             transformXml.Attributes("Transform").Any()));
-        }
-
-        protected virtual bool HasAfterBuildTarget(string conditionConfig)
-        {
-            return
-                _projectRoot.ElementsAnyNs("Target").Any(
-                    target => target.HasAttributes && target.Attributes("Name").Any(name => name.Value == "AfterBuild") &&
-                         target.Attributes("Condition").Any(condition => condition.Value == conditionConfig) && target.HasElements &&
-                         target.ElementsAnyNs("TransformXml").Any(
-                             transformXml =>
-                             transformXml.HasAttributes && transformXml.Attributes("Source").Any() &&
-                             transformXml.Attributes("Destination").Any() &&
-                             transformXml.Attributes("Transform").Any()));
-        }
-
-        protected virtual bool HasAfterPublishTarget()
-        {
-            return
-                _projectRoot.ElementsAnyNs("Target").Any(
-                    target => target.HasAttributes && target.Attributes("Name").Any(name => name.Value == "AfterPublish") &&
-                         target.HasElements && target.ElementsAnyNs("PropertyGroup").Any(propertyGroup => propertyGroup.HasElements));
-        }
     }
 }

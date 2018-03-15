@@ -49,5 +49,6 @@ namespace GolanAvraham.ConfigurationTransform.Services
         //     Window frame for the comparison view.
         IVsWindowFrame OpenComparisonWindow2(string leftFileMoniker, string rightFileMoniker, string caption, string tooltip, string leftLabel, string rightLabel, string inlineLabel, string roles, uint grfDiffOptions);
         void OpenDiff(string leftFile, string rightFile, string leftLabel, string rightLabel);
+        void OutputLine(string message);
     }
 }

@@ -26,5 +26,10 @@ namespace GolanAvraham.ConfigurationTransform.Services
             _documentEvents.DocumentClosing -= DocumentEvents_DocumentClosing;
             DeleteFile();
         }
+
+        public static void Register(string filePath, DocumentEvents documentEvents)
+        {
+            new DeleteFileOnDocumentClose(filePath, documentEvents);
+        }
     }
 }
