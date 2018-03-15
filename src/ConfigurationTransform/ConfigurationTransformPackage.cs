@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using EnvDTE;
+using GolanAvraham.ConfigurationTransform.Remove;
 using GolanAvraham.ConfigurationTransform.Services;
 using GolanAvraham.ConfigurationTransform.Transform;
 using Microsoft.VisualStudio;
@@ -78,6 +79,9 @@ namespace GolanAvraham.ConfigurationTransform
                 var previewCommandId = new CommandID(GuidList.guidConfigurationTransformCmdSet, (int)PkgCmdIDList.cmdidPreviewConfigTransforms);
                 var previewOleMenuCommand = new OleMenuCommand(PreviewMenuItemCallback, null, PreviewBeforeQueryStatus, previewCommandId);
                 mcs.AddCommand(previewOleMenuCommand);
+
+                // Remove
+                RemoveCommand.Create(this, GuidList.ProjectMenuGroupCmdSet, (int) PkgCmdIDList.RemoveCommandId);
             }
         }
 

@@ -43,12 +43,16 @@
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
-
+    
+      <!-- Group project items menu commands-->
       <Group guid="guidConfigurationTransformCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE" />
       </Group>
       
-
+      <!-- Group project menu commands-->
+      <Group guid="ProjectMenuGroupCmdSet" id="ProjectMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
+      </Group>
 
     </Groups>
     
@@ -81,11 +85,21 @@
         <Icon guid="guidImages" id="transformPic" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <CommandName>cmdidAddConfigTransforms</CommandName>
+          <CommandName>cmdidPreviewConfigTransforms</CommandName>
           <ButtonText>Preview Config Transforms</ButtonText>
         </Strings>
       </Button>
-
+      
+      <!-- Remove -->
+      <Button guid="ProjectMenuGroupCmdSet" id="RemoveCommandId" priority="0X110" type="Button">
+        <Parent guid="ProjectMenuGroupCmdSet" id="ProjectMenuGroup" />
+        <Icon guid="guidImages" id="transformPic" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>RemoveCommandId</CommandName>
+          <ButtonText>Remove old Config Transforms</ButtonText>
+        </Strings>
+      </Button>
 
     </Buttons>
    
@@ -119,6 +133,12 @@
       <IDSymbol name="cmdidPreviewConfigTransforms" value="0x0101" />
     </GuidSymbol>
     
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="ProjectMenuGroupCmdSet" value="{6B8B19D3-D46F-4C88-94D6-E064A475F204}">
+
+      <IDSymbol name="ProjectMenuGroup" value="0x1021" />
+      <IDSymbol name="RemoveCommandId" value="0X110" />
+    </GuidSymbol>
     
     
     <GuidSymbol name="guidImages" value="{43441cc5-1ce8-47fd-b765-e499fb627619}">
