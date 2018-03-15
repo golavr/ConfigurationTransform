@@ -6,8 +6,10 @@
         <Description xml:space="preserve">Automatically transform app.config or any other config during build process. Once the transformation is set, it will run on other build machines without the extension.</Description>
         <MoreInfo>https://marketplace.visualstudio.com/items?itemName=GolanAvraham.ConfigurationTransform</MoreInfo>
         <License>license.txt</License>
+        <ReleaseNotes>https://github.com/golavr/ConfigurationTransform/wiki/v3.2-Release-Notes</ReleaseNotes>
         <Icon>package_icon.png</Icon>
         <PreviewImage>package_preview.png</PreviewImage>
+        <Tags>app.config;Build;Configuration;diff;Team Development;Transform;XDT</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[11.0,15.0]" />
