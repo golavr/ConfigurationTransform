@@ -38,19 +38,31 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
 
         public static ProjectItem ParentProjectItemOrDefault(this ProjectItem source)
         {
-            var containingProject = source.ContainingProject;
-            if (containingProject == null) return null;
+            // getting the parent of the clicked project item
+            var parent = (ProjectItem) source.Collection.Parent;
 
-            foreach (var projectItem in containingProject.ProjectItems.AsEnumerable())
+            if (source.IsFolder())
             {
-                var found = projectItem.ContainingProjectItem(item => item.Name == source.Name).FirstOrDefault();
-                // found self(source is root)?
-                if (projectItem == found) return null;
-                // found sub project item?
-                if (found != null) return projectItem;
+                // since the parent is a folder, let's return null to soh errors message.
+                return null;
+            }
+            
+            return parent;
+            
+        }
+
+        public static bool IsFolder(this ProjectItem source)
+        {
+            // Kind of hacky solution, but i works. There could be other ways to do this as well: https://stackoverflow.com/questions/14272729/how-to-get-folders-under-projects
+
+            string location = source.get_FileNames(1);
+            if (location.EndsWith(@"\"))
+            {
+                // It is a folder E.g C:\\Abc\\Xyz\\
+                return true;
             }
 
-            return null;
+            return false;
         }
 
         public static bool IsLink(this ProjectItem source)
