@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using EnvDTE;
 
 namespace GolanAvraham.ConfigurationTransform.Services.Extensions
@@ -38,8 +39,20 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
 
         public static ProjectItem ParentProjectItemOrDefault(this ProjectItem source)
         {
-            // getting the parent of the clicked project item
-            var parent = (ProjectItem) source.Collection.Parent;
+            ProjectItem parent = null;
+
+            // trying to convert source.Collection.Parent into a ProjectItem since this is the only type that
+            // makes sense in when wanting to show a preview of a transform.
+            try
+            {
+                // getting the parent of the clicked project item
+                parent = (ProjectItem)source.Collection.Parent;
+            }
+            catch (InvalidCastException e)
+            {
+                // returning null to show info/error-message.
+                return null;
+            }
 
             if (source.IsFolder())
             {
