@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using EnvDTE;
 using GolanAvraham.ConfigurationTransform.Remove;
 using GolanAvraham.ConfigurationTransform.Services;
@@ -105,9 +106,16 @@ namespace GolanAvraham.ConfigurationTransform
                 var selectedItem = dte2.GetSelectedItem();
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
-                //if (!ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name)) return;
 
-                menuCommand.Visible = true;
+                // Only show the preview-option if this is a configuration transform file. 
+                // Meaning, that this file Must have a parent that is of type "ProjectItem".
+                if (_selectedProjectItem.ParentProjectItemOrDefault() != null)
+                {
+                    menuCommand.Visible = true;
+                }
+               
+                //if (!ConfigTransformManager.IsTransformConfigName(_selectedProjectItem.Name)) return;
+ 
             }
             catch (Exception e)
             {
@@ -149,6 +157,17 @@ namespace GolanAvraham.ConfigurationTransform
                 // cache selected config project
                 _selectedProjectItem = selectedItem.ProjectItem;
                 if (_selectedProjectItem == null) return;
+
+                // Only show the "Add config transform"-option if the selected config-file does not have any children already.
+                if (_selectedProjectItem.ProjectItems.Count > 0) return;
+                
+                // Don't show the "Add config transform"-option if this is a child of a config-file aka. a transform file.
+                var parent = _selectedProjectItem.ParentProjectItemOrDefault();
+                if (parent != null)
+                {
+                    if (parent.Name.EndsWith(".config", StringComparison.OrdinalIgnoreCase)) return;
+                }
+
                 //if (!ConfigTransformManager.IsRootConfig(_selectedProjectItem.Name)) return;
 
                 menuCommand.Visible = true;
