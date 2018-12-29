@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -162,8 +163,8 @@ namespace GolanAvraham.ConfigurationTransform.Transform
             bool transformConfigIsLink = false)
         {
             var spliterIndex = anyConfigName.LastIndexOf('.');
-            if (spilterIndex < 0)
-                throw new NotSupportedException(sourceConfigName);
+            if (spliterIndex < 0)
+                throw new NotSupportedException(anyConfigName);
 
             var configName = anyConfigName.Substring(0, spliterIndex);
             var configExt = anyConfigName.Substring(spliterIndex + 1);
