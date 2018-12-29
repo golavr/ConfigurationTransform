@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using GolanAvraham.ConfigurationTransform.Services;
 
@@ -160,9 +161,12 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         public TargetTransformArgs GetTargetTransformArgs(string anyConfigName, string relativePrefix = null,
             bool transformConfigIsLink = false)
         {
-            var configSplit = anyConfigName.Split('.');
-            var configName = configSplit[0];
-            var configExt = configSplit[1];
+            var spliterIndex = anyConfigName.LastIndexOf('.');
+            if (spilterIndex < 0)
+                throw new NotSupportedException(sourceConfigName);
+
+            var configName = anyConfigName.Substring(0, spliterIndex);
+            var configExt = anyConfigName.Substring(spliterIndex + 1);
 
             if (relativePrefix != null)
             {
