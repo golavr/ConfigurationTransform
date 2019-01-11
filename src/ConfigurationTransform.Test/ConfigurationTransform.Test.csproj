@@ -83,6 +83,7 @@
     <Compile Include="ConfigTransformManagerTest.cs" />
     <Compile Include="ProjectItemExtensionsTest.cs" />
     <Compile Include="ProjectItemsExtensionsTest.cs" />
+    <Compile Include="VsProjectXmlTransformTest.cs" />
     <Compile Include="VsServicesTest.cs" />
     <Compile Include="XmlTransformTest.cs" />
   </ItemGroup>

@@ -23,6 +23,7 @@ namespace ConfigurationTransform.Test
         const string TransformAppConfig = @"app.MockBuild.config";
         const string TransformWithoutConfigExtension = @"app.MockBuild";
         const string FileWith3Dots = @"mockfile.mockMiddle.mock";
+        const string FileWithMoreDots = @"file.with.more.dots.config";
 
         const string BuildMock = @"MockBuild";
 
@@ -56,6 +57,21 @@ namespace ConfigurationTransform.Test
 
             //Act
             ConfigTransformManager.GetTransformConfigName(sourceConfigName, buildConfigurationName);
+        }
+
+        [TestMethod]
+        public void GetTransformConfigName_WhenMoreDots_Success()
+        {
+            //Arrange
+            const string sourceConfigName = FileWithMoreDots;
+            const string buildConfigurationName = BuildMock;
+            const string expected = @"file.with.more.dots.MockBuild.config";
+
+            //Act
+            var actual = ConfigTransformManager.GetTransformConfigName(sourceConfigName, buildConfigurationName);
+
+            //Assert
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]

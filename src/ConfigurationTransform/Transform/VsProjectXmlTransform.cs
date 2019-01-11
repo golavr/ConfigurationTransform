@@ -162,12 +162,12 @@ namespace GolanAvraham.ConfigurationTransform.Transform
         public TargetTransformArgs GetTargetTransformArgs(string anyConfigName, string relativePrefix = null,
             bool transformConfigIsLink = false)
         {
-            var spliterIndex = anyConfigName.LastIndexOf('.');
-            if (spliterIndex < 0)
+            var splitterIndex = anyConfigName.LastIndexOf('.');
+            if (splitterIndex < 0)
                 throw new NotSupportedException(anyConfigName);
 
-            var configName = anyConfigName.Substring(0, spliterIndex);
-            var configExt = anyConfigName.Substring(spliterIndex + 1);
+            var configName = anyConfigName.Substring(0, splitterIndex);
+            var configExt = anyConfigName.Substring(splitterIndex + 1);
 
             if (relativePrefix != null)
             {
