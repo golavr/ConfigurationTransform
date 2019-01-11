@@ -234,9 +234,11 @@ namespace GolanAvraham.ConfigurationTransform.Transform
 
         public static string GetTransformConfigName(string sourceConfigName, string buildConfigurationName)
         {
-            var configSplit = sourceConfigName.Split('.');
-            if (configSplit.Length < 2) throw new NotSupportedException(sourceConfigName);
-            var dependentConfig = $"{configSplit[0]}.{buildConfigurationName}.{configSplit[1]}";
+            var splitterIndex = sourceConfigName.LastIndexOf('.');
+            if(splitterIndex < 0)
+                throw new NotSupportedException(sourceConfigName);
+
+            var dependentConfig = $"{sourceConfigName.Substring(0, splitterIndex)}.{buildConfigurationName}.{sourceConfigName.Substring(splitterIndex + 1)}";
             return dependentConfig;
         }
 
