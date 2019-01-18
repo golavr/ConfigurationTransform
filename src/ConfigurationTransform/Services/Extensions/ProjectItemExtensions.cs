@@ -37,9 +37,12 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             return propertyValue;
         }
 
+        /// <summary>
+        /// Returns the parent ProjectItem or null if no parent or if parent is not a ProjectItem.
+        /// </summary>
         public static ProjectItem ParentProjectItemOrDefault(this ProjectItem source)
         {
-            if (!(source.Collection.Parent is ProjectItem parent)) return null;
+            if (!(source?.Collection?.Parent is ProjectItem parent)) return null;
             return parent;
         }
 
