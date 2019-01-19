@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using EnvDTE;
 
 namespace GolanAvraham.ConfigurationTransform.Services.Extensions
@@ -36,21 +37,13 @@ namespace GolanAvraham.ConfigurationTransform.Services.Extensions
             return propertyValue;
         }
 
+        /// <summary>
+        /// Returns the parent ProjectItem or null if no parent or if parent is not a ProjectItem.
+        /// </summary>
         public static ProjectItem ParentProjectItemOrDefault(this ProjectItem source)
         {
-            var containingProject = source.ContainingProject;
-            if (containingProject == null) return null;
-
-            foreach (var projectItem in containingProject.ProjectItems.AsEnumerable())
-            {
-                var found = projectItem.ContainingProjectItem(item => item.Name == source.Name).FirstOrDefault();
-                // found self(source is root)?
-                if (projectItem == found) return null;
-                // found sub project item?
-                if (found != null) return projectItem;
-            }
-
-            return null;
+            if (!(source?.Collection?.Parent is ProjectItem parent)) return null;
+            return parent;
         }
 
         public static bool IsLink(this ProjectItem source)
