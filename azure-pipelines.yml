@@ -35,7 +35,7 @@ steps:
 - task: CopyFiles@2
   inputs:
     sourceFolder: '$(Agent.BuildDirectory)'
-    contents: '**/bin/**'
+    contents: '**/ConfigurationTransform/bin/Release/**'
     targetFolder: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
