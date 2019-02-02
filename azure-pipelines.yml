@@ -16,18 +16,46 @@ variables:
 
 steps:
 - task: NuGetToolInstaller@0
+  displayName: 'Use NuGet >=4.5.0'
+  inputs:
+    versionSpec: '>=4.5.0'
 
 - task: NuGetCommand@2
+  displayName: 'NuGet restore'
   inputs:
     restoreSolution: '$(solution)'
 
 - task: VSBuild@1
+  displayName: 'Build solution'
   inputs:
     solution: '$(solution)'
+    msbuildArgs: '/p:DeployExtension=false'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
 - task: VSTest@2
+  displayName: 'Test solution'
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: CopyFiles@2
+  displayName: 'Stage VSIX artifact'
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\src\ConfigurationTransform\bin\$(buildConfiguration)'
+    Contents: ConfigurationTransform.vsix
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- task: CopyFiles@2
+  displayName: 'Stage marketplace publish artifacts'
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: |
+     resources\**
+     extension.manifest.json
+     README.md
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+
