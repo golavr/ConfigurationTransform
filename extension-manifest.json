@@ -12,28 +12,28 @@
     "repo": "https://github.com/golavr/ConfigurationTransform",
     "assetFiles": [
         {
-            "pathOnDisk": ".\\resources\\add_as_linked_config.png",
-            "targetPath": "./resources/add_as_linked_config.png"
+            "pathOnDisk": "resources\\add_as_linked_config.png",
+            "targetPath":  "resources/add_as_linked_config.png"
         },
         {
-            "pathOnDisk": ".\\resources\\app_configs.png",
-            "targetPath": "./resources/app_configs.png"
+            "pathOnDisk": "resources\\app_configs.png",
+            "targetPath":  "resources/app_configs.png"
         },
         {
-            "pathOnDisk": ".\\resources\\configuration_manager.png",
-            "targetPath": "./resources/configuration_manager.png"
+            "pathOnDisk": "resources\\configuration_manager.png",
+            "targetPath":  "resources/configuration_manager.png"
         },
         {
-            "pathOnDisk": ".\\resources\\package_preview.png",
-            "targetPath": "./resources/package_preview.png"
+            "pathOnDisk": "resources\\package_preview.png",
+            "targetPath":  "resources/package_preview.png"
         },
         {
-            "pathOnDisk": ".\\resources\\peview_solution_explorer.png",
-            "targetPath": "./resources/peview_solution_explorer.png"
+            "pathOnDisk": "resources\\peview_solution_explorer.png",
+            "targetPath":  "resources/peview_solution_explorer.png"
         },
         {
-            "pathOnDisk": ".\\resources\\preview_diff.png",
-            "targetPath": "./resources/preview_diff.png"
+            "pathOnDisk": "resources\\preview_diff.png",
+            "targetPath":  "resources/preview_diff.png"
         }
     ]
   }

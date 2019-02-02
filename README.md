@@ -27,15 +27,15 @@ For more information how to use XDT (XML document transform) see [http://go.micr
 
 2. Right click **App.config** file in solution explorer and select **_Add Config Transforms_**
 
-   ![](./resources/package_preview.png)
+   ![](resources/package_preview.png)
 
    Notice that you have new App.$$$.config files under App.config
 
-   ![](./resources/app_configs.png)
+   ![](resources/app_configs.png)
 
    corresponding to build configurations
 
-   ![](./resources/configuration_manager.png)
+   ![](resources/configuration_manager.png)
 
 3. Set the source **App.config**
 
@@ -68,15 +68,15 @@ For more information how to use XDT (XML document transform) see [http://go.micr
 
 2. Right click link **App.config** file in solution explorer and select **_Add Config Transforms_**
 
-   ![](./resources/package_preview.png)
+   ![](resources/package_preview.png)
 
    Click _**Yes**_ button, if you select _**No**_ button concrete(not linked) config files will be created which suits certain use case
 
-   ![](./resources/add_as_linked_config.png)
+   ![](resources/add_as_linked_config.png)
 
    Notice that you have new App.$$$.config files under App.config
 
-   ![](./resources/app_configs.png)
+   ![](resources/app_configs.png)
 
    corresponding to source App.config files
 
@@ -84,9 +84,9 @@ For more information how to use XDT (XML document transform) see [http://go.micr
 
 ### Preview: ###
 
-![](./resources/peview_solution_explorer.png)
+![](resources/peview_solution_explorer.png)
 
-![](./resources/preview_diff.png)
+![](resources/preview_diff.png)
 
 ### Changelog: ###
 
