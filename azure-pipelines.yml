@@ -52,7 +52,7 @@ steps:
     SourceFolder: '$(Build.SourcesDirectory)'
     Contents: |
      resources\**
-     extension.manifest.json
+     extension-manifest.json
      README.md
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
