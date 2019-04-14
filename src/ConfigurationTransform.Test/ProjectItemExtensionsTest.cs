@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms.Design.Behavior;
 using EnvDTE;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
