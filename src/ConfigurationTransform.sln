@@ -1,30 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3718D225-EC78-45A4-BEEC-07DB37A411C2}"
-	ProjectSection(SolutionItems) = preProject
-		ConfigurationTransform.vsmdi = ConfigurationTransform.vsmdi
-		Local.testsettings = Local.testsettings
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionResources", "SolutionResources", "{48E4E05B-7604-477A-A450-6DDE8210C3CF}"
-	ProjectSection(SolutionItems) = preProject
-		SolutionResources\envdte.dll = SolutionResources\envdte.dll
-		SolutionResources\Microsoft.VisualStudio.OLE.Interop.dll = SolutionResources\Microsoft.VisualStudio.OLE.Interop.dll
-		SolutionResources\Microsoft.VisualStudio.Shell.10.0.dll = SolutionResources\Microsoft.VisualStudio.Shell.10.0.dll
-		SolutionResources\Microsoft.VisualStudio.Shell.Immutable.10.0.dll = SolutionResources\Microsoft.VisualStudio.Shell.Immutable.10.0.dll
-		SolutionResources\Microsoft.VisualStudio.Shell.Interop.10.0.dll = SolutionResources\Microsoft.VisualStudio.Shell.Interop.10.0.dll
-		SolutionResources\Microsoft.VisualStudio.Shell.Interop.11.0.dll = SolutionResources\Microsoft.VisualStudio.Shell.Interop.11.0.dll
-		SolutionResources\Microsoft.VisualStudio.Shell.Interop.12.0.dll = SolutionResources\Microsoft.VisualStudio.Shell.Interop.12.0.dll
-		SolutionResources\Microsoft.VisualStudio.Shell.Interop.8.0.dll = SolutionResources\Microsoft.VisualStudio.Shell.Interop.8.0.dll
-		SolutionResources\Microsoft.VisualStudio.Shell.Interop.9.0.dll = SolutionResources\Microsoft.VisualStudio.Shell.Interop.9.0.dll
-		SolutionResources\Microsoft.VisualStudio.Shell.Interop.dll = SolutionResources\Microsoft.VisualStudio.Shell.Interop.dll
-		SolutionResources\Microsoft.Web.XmlTransform.dll = SolutionResources\Microsoft.Web.XmlTransform.dll
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationTransform", "ConfigurationTransform\ConfigurationTransform.csproj", "{E4538816-241F-40B4-B962-65CCF294FBBA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationTransform.Test", "ConfigurationTransform.Test\ConfigurationTransform.Test.csproj", "{FD8CFB45-F75B-40DC-899A-F07233BA64E7}"
@@ -47,7 +25,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = ConfigurationTransform.vsmdi
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B8CD52A8-418E-4EEB-926F-C44E7656BE63}
 	EndGlobalSection
 EndGlobal
