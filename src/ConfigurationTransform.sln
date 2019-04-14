@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3718D225-EC78-45A4-BEEC-07DB37A411C2}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionResources", "SolutionResources", "{48E4E05B-7604-477A-A450-6DDE8210C3CF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationTransform", "ConfigurationTransform\ConfigurationTransform.csproj", "{E4538816-241F-40B4-B962-65CCF294FBBA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationTransform.Test", "ConfigurationTransform.Test\ConfigurationTransform.Test.csproj", "{FD8CFB45-F75B-40DC-899A-F07233BA64E7}"
