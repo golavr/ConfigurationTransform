@@ -40,7 +40,7 @@ namespace GolanAvraham.ConfigurationTransform
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(GuidList.guidConfigurationTransformPkgString)]
     //Specifies a UI context in which a solution exists.
-    [ProvideAutoLoad("{f1536ef8-92ec-443c-9ed7-fdadf150da82}")]
+    [ProvideAutoLoad("{f1536ef8-92ec-443c-9ed7-fdadf150da82}", PackageAutoLoadFlags.BackgroundLoad)]
     public sealed class ConfigurationTransformPackage : AsyncPackage
     {
         /// <summary>
