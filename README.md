@@ -84,7 +84,7 @@ For more information how to use XDT (XML document transform) see [http://go.micr
 
 ### Preview: ###
 
-![](resources/peview_solution_explorer.png)
+![](resources/preview_solution_explorer.png)
 
 ![](resources/preview_diff.png)
 

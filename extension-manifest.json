@@ -28,8 +28,8 @@
             "targetPath":  "resources/package_preview.png"
         },
         {
-            "pathOnDisk": "resources\\peview_solution_explorer.png",
-            "targetPath":  "resources/peview_solution_explorer.png"
+            "pathOnDisk": "resources\\preview_solution_explorer.png",
+            "targetPath":  "resources/preview_solution_explorer.png"
         },
         {
             "pathOnDisk": "resources\\preview_diff.png",
