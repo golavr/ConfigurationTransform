@@ -21,7 +21,7 @@ namespace ConfigurationTransform.Test
             Action action = () => sut.HasUsingTaskTransformXml(null);
 
             //Assert
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace ConfigurationTransform.Test
             Action action = () => sut.GetTargetName(null, AfterTargets.AfterBuild);
 
             //Assert
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace ConfigurationTransform.Test
             Action action = () => sut.GetTarget(null, string.Empty);
 
             //Assert
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
 
@@ -103,7 +103,7 @@ namespace ConfigurationTransform.Test
             Action action = () => sut.GetTarget(root, string.Empty);
 
             //Assert
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [TestMethod]
@@ -131,7 +131,7 @@ namespace ConfigurationTransform.Test
             Action action = () => sut.GetTarget(root, "mock_target");
 
             //Assert
-            action.ShouldThrow<XmlSchemaValidationException>()
+            action.Should().Throw<XmlSchemaValidationException>()
                 .And.LineNumber.Should().BeGreaterThan(0);
         }
 
