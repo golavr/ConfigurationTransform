@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="c347e8c1-66cb-475a-8eb4-a5a2018452fc" Version="3.5.0" Language="en-US" Publisher="Golan Avraham" />
+        <Identity Id="c347e8c1-66cb-475a-8eb4-a5a2018452fc" Version="3.5.1" Language="en-US" Publisher="Golan Avraham" />
         <DisplayName>Configuration Transform</DisplayName>
         <Description xml:space="preserve">Automatically transform app.config or any other config during build process. Once the transformation is set, it will run on other build machines without the extension.</Description>
         <MoreInfo>https://marketplace.visualstudio.com/items?itemName=GolanAvraham.ConfigurationTransform</MoreInfo>
