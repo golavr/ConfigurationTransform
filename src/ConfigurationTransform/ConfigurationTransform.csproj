@@ -127,7 +127,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="15.9.3" ExcludeAssets="runtime" />
+    <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.0.2268" />
     <PackageReference Include="Microsoft.Web.Xdt">
       <Version>3.0.0</Version>
